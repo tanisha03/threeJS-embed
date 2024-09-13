@@ -30,6 +30,11 @@ function init() {
   const canvas = document.createElement('canvas');
   canvas.id = 'c';
   document.body.appendChild(canvas);
+  canvas.style.position = 'absolute';
+  canvas.style.bottom = '0';
+  canvas.style.right = '0';
+  canvas.style.height = '200px';
+  canvas.style.width = '200px';
   const backgroundColor = 0xf1f1f1;
   
   // Below that, let’s create a new Scene. Here we set the background color, and we’re also going to add some fog. This isn’t that visible in this tutorial, but if your floor and background color are different, it can come in handy to blur those together.
