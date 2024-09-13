@@ -128,11 +128,8 @@ function init() {
   scene.add(dirLight);
   
   let floorGeometry = new THREE.PlaneGeometry(5000, 5000, 1, 1);
-  let floorMaterial = new THREE.MeshPhongMaterial({
-    color: 0xeeeeee,
-    shininess: 0,
-    transparent: true,
-    opacity: 0  
+  let floorMaterial = new THREE.ShadowMaterial({
+    opacity: 0.5,  // Control how dark the shadow is
   });
   
   let floor = new THREE.Mesh(floorGeometry, floorMaterial);
