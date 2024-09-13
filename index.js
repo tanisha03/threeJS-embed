@@ -31,7 +31,8 @@ function init() {
   const backgroundColor = 0xf1f1f1;
     
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(backgroundColor, 60, 100);
+  // scene.background = new THREE.Color(backgroundColor, 60, 100);
+  scene.background = null;
 
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   // renderer = new THREE.WebGLRenderer({canvas, antialias: true})
