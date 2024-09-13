@@ -26,8 +26,8 @@ function init() {
   canvas.style.position = 'absolute';
   canvas.style.bottom = '0';
   canvas.style.right = '0';
-  canvas.style.height = '200px';
-  canvas.style.width = '200px';
+  canvas.style.height = '320px';
+  canvas.style.width = '320px';
   const backgroundColor = 0xf1f1f1;
     
   scene = new THREE.Scene();
