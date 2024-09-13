@@ -32,8 +32,9 @@ function init() {
     
   scene = new THREE.Scene();
   scene.background = new THREE.Color(backgroundColor, 60, 100);
-    
-  renderer = new THREE.WebGLRenderer({canvas, antialias: true})
+
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  // renderer = new THREE.WebGLRenderer({canvas, antialias: true})
   renderer.shadowMap.enabled = true;
   renderer.setPixelRatio(window.devicePixelRatio);
   document.body.appendChild(renderer.domElement);
