@@ -11,8 +11,7 @@ let scene,
   idle,                               // Idle, the default state our character returns to
   clock = new THREE.Clock(),          // Used for anims, which run to a clock instead of frame rate 
   currentlyAnimating = false,         // Used to check whether characters neck is being used in another anim
-  raycaster = new THREE.Raycaster(),  // Used to detect the click on our character
-  loaderAnim = document.getElementById('js-loader');
+  raycaster = new THREE.Raycaster();  // Used to detect the click on our character
 
 init();
 
@@ -21,21 +20,18 @@ function init() {
   const MODEL_PATH = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1376484/stacy_lightweight.glb';
   
   const canvas = document.createElement('canvas');
-  canvas.id = 'c';
+  canvas.id = 'threejs-canvas';
   document.body.appendChild(canvas);
   canvas.style.position = 'absolute';
   canvas.style.bottom = '0';
   canvas.style.right = '0';
   canvas.style.height = '320px';
   canvas.style.width = '320px';
-  const backgroundColor = 0xf1f1f1;
     
   scene = new THREE.Scene();
-  // scene.background = new THREE.Color(backgroundColor, 60, 100);
   scene.background = null;
 
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  // renderer = new THREE.WebGLRenderer({canvas, antialias: true})
   renderer.shadowMap.enabled = true;
   renderer.setPixelRatio(window.devicePixelRatio);
   document.body.appendChild(renderer.domElement);
@@ -61,7 +57,6 @@ function init() {
   });
   
   var loader = new THREE.GLTFLoader();
-  
   
   loader.load(
   MODEL_PATH,
@@ -89,7 +84,6 @@ function init() {
       model.scale.set(7, 7, 7);
       model.position.y = -11;
       scene.add(model);
-      loaderAnim.remove();
       mixer = new THREE.AnimationMixer(model);
       let clips = fileAnimations.filter(val => val.name !== 'idle');
       possibleAnims = clips.map(val => {
@@ -97,7 +91,10 @@ function init() {
         clip.tracks.splice(3, 3);
         clip.tracks.splice(9, 3);
         clip = mixer.clipAction(clip);
-        return clip;
+        return {
+          name: val.name,
+          clip
+        };
       });
       
       let idleAnim = THREE.AnimationClip.findByName(fileAnimations, 'idle');
@@ -105,12 +102,15 @@ function init() {
       idleAnim.tracks.splice(9, 3);
       idle = mixer.clipAction(idleAnim);
       idle.play();
+
+      waveOnLoad();
     },
     undefined, // We don't need this function
     function(error) {
       console.error(error);
     }
   );
+
   let hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.61);
   hemiLight.position.set(0, 50, 0);
   // Add hemisphere light to scene
@@ -139,17 +139,9 @@ function init() {
   floor.receiveShadow = true;
   floor.position.y = -11;
   scene.add(floor);
-  
-  let geometry = new THREE.SphereGeometry(8, 32, 32);
-  let material = new THREE.MeshBasicMaterial({ color: 0x9bffaf}); // 0xf2ce2e
-  let sphere = new THREE.Mesh(geometry,material);
-  sphere.position.z = -15;
-  sphere.position.y = -2.5;
-  sphere.position.x = -0.25;
-  scene.add(sphere);
 }
   
-  function update() {
+function update() {
     if (mixer) {
       mixer.update(clock.getDelta());
     }
@@ -160,9 +152,10 @@ function init() {
     }
     renderer.render(scene, camera);
     requestAnimationFrame(update);
-  }
-  update();
-  function resizeRendererToDisplaySize(renderer) {
+}
+update();
+
+function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -175,70 +168,97 @@ function init() {
       renderer.setSize(width, height, false)
     }
     return needResize;
-  }
-     
-  window.addEventListener('click', e => raycast(e));
-window.addEventListener('touchend', e => raycast(e, true));
-
-function raycast(e, touch = false) {
-  var mouse = {};
-  if (touch) {
-    mouse.x = 2 * (e.changedTouches[0].clientX / window.innerWidth) - 1;
-    mouse.y = 1 - 2 * (e.changedTouches[0].clientY / window.innerHeight);
-  } else {
-    mouse.x = 2 * (e.clientX / window.innerWidth) - 1;
-    mouse.y = 1 - 2 * (e.clientY / window.innerHeight);
-  }
-  raycaster.setFromCamera(mouse, camera);
-
-  var intersects = raycaster.intersectObjects(scene.children, true);
-
-  if (intersects[0]) {
-    var object = intersects[0].object;
-
-    if (object.name === 'stacy') {
-
-      if (!currentlyAnimating) {
-        currentlyAnimating = true;
-        playOnClick();
-      }
-    }
-  }
 }
-  function playOnClick() {
-    let anim = Math.floor(Math.random() * possibleAnims.length) + 0;
-    playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
-  }
+     
+window.addEventListener('click', () => playOnClick());
+window.addEventListener('touchend', () => playOnClick());
+
+function playOnClick() {
+  console.log('~~~~ here', possibleAnims);
+  let anim = Math.floor(Math.random() * possibleAnims.length) + 0;
+  playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
+}
+
+function waveOnLoad() {
+  const idx = possibleAnims.findIndex(animation => animation.name === "wave");
+  playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+  showTooltip();
+}
+        
+function showTooltip() {
+    const tooltip = document.createElement('div');
+    tooltip.id = 'tooltip';
+    tooltip.innerHTML = 'Welcome to Sulphur Labs';
+
+    tooltip.style.position = 'absolute';
+    tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+    tooltip.style.color = '#fff';
+    tooltip.style.padding = '8px';
+    tooltip.style.borderRadius = '5px';
+    tooltip.style.fontSize = '14px';
+    tooltip.style.display = 'none';
+    tooltip.style.pointerEvents = 'none';
+    tooltip.style.whiteSpace = 'nowrap';
+    tooltip.style.zIndex = '10'
+    // Arrow style for the tooltip using a pseudo element
+    tooltip.style.position = 'absolute';
+    tooltip.style.setProperty('--tooltip-arrow-size', '5px');
+    tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(0, 0, 0, 0.75)')
+    const arrow = document.createElement('div');
+    arrow.style.position = 'absolute';
+    arrow.style.width = '0';
+    arrow.style.height = '0';
+    arrow.style.borderLeft = '5px solid transparent';
+    arrow.style.borderRight = '5px solid transparent';
+    arrow.style.borderTop = '5px solid rgba(0, 0, 0, 0.75)';
+    arrow.style.bottom = '-5px';
+    arrow.style.left = '50%';
+    arrow.style.transform = 'translateX(-50%)';
+    tooltip.appendChild(arrow);
+
+    document.body.appendChild(tooltip);
+    const canvas = document.getElementById('threejs-canvas');
+    const canvasBounds = canvas.getBoundingClientRect();
+    console.log(canvasBounds);
+    tooltip.style.left = (canvasBounds.left + 80) + 'px';
+    tooltip.style.top = (canvasBounds.top + 56) + 'px';
+    tooltip.style.display = 'block';
+    setTimeout(() => {
+        tooltip.style.display = 'none';
+    }, 5000);
+}
+
+function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
+  const to = finalAnim.clip;
+  to.setLoop(THREE.LoopOnce);
+  to.reset();
+  to.play();
+  from.crossFadeTo(to, fSpeed, true);
+  setTimeout(function() {
+    from.enabled = true;
+    to.crossFadeTo(from, tSpeed, true);
+    currentlyAnimating = false;
+  }, to._clip.duration * 1000 -((tSpeed + fSpeed) * 1000));
+}
   
-  function playModifierAnimation(from, fSpeed, to, tSpeed) {
-    to.setLoop(THREE.LoopOnce);
-    to.reset();
-    to.play();
-    from.crossFadeTo(to, fSpeed, true);
-    setTimeout(function() {
-      from.enabled = true;
-      to.crossFadeTo(from, tSpeed, true);
-      currentlyAnimating = false;
-    }, to._clip.duration * 1000 -((tSpeed + fSpeed) * 1000));
-  }
-  
-  document.addEventListener('mousemove', function(e) {
+document.addEventListener('mousemove', function(e) {
     var mousecoords = getMousePos(e);
     if(neck && waist) {
       moveJoint(mousecoords, neck, 50);
       moveJoint(mousecoords, waist, 30);
     }
-  });
-  function getMousePos(e) {
+});
+
+function getMousePos(e) {
     return { x: e.clientX, y: e.clientY};
-  }
-  function moveJoint(mouse, joint, degreeLimit) {
+}
+function moveJoint(mouse, joint, degreeLimit) {
     let degrees = getMouseDegrees(mouse.x, mouse.y, degreeLimit);
     joint.rotation.y = THREE.Math.degToRad(degrees.x);
     joint.rotation.x = THREE.Math.degToRad(degrees.y); 
-  }
-  
-  function getMouseDegrees(x, y, degreeLimit) {
+}
+
+function getMouseDegrees(x, y, degreeLimit) {
   let dx = 0,
       dy = 0,
       xdiff,
