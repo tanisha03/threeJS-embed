@@ -197,7 +197,7 @@ function waveOnLoad() {
     showTooltip('Welcome to Sulphur Labs', 2000);
   }
   const inputPage = document.getElementById('pricing')?.value;
-  if(path === inputPage && !currentlyAnimating){
+  if(path.includes(inputPage) && !currentlyAnimating){
     console.log(possibleAnims);
     const idx = possibleAnims.findIndex(animation => animation.name === "swingdance");
     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
