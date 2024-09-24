@@ -18,11 +18,18 @@ init();
 function init() {
   
   const MODEL_PATH = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1376484/stacy_lightweight.glb';
-  
+  const MODEL_IMAGE = 'https://i.ibb.co/PYgxQb1/Screenshot-2024-09-24-at-8-21-23-PM-removebg-preview.png';
+  const fallbackImg = document.createElement('img');
+  fallbackImg.src = MODEL_IMAGE;
+  fallbackImg.style.position = 'fixed';
+  fallbackImg.style.bottom = '52px';
+  fallbackImg.style.right = '72px';
+  fallbackImg.style.height = '176px';
+  fallbackImg.style.width = '160px';
   const canvas = document.createElement('canvas');
   canvas.id = 'threejs-canvas';
   document.body.appendChild(canvas);
-  canvas.style.position = 'absolute';
+  canvas.style.position = 'fixed';
   canvas.style.bottom = '0';
   canvas.style.right = '0';
   canvas.style.height = '320px';
@@ -35,6 +42,7 @@ function init() {
   renderer.shadowMap.enabled = true;
   renderer.setPixelRatio(window.devicePixelRatio);
   document.body.appendChild(renderer.domElement);
+  document.body.appendChild(fallbackImg);
   
     camera = new THREE.PerspectiveCamera(
     50,
@@ -102,7 +110,7 @@ function init() {
       idleAnim.tracks.splice(9, 3);
       idle = mixer.clipAction(idleAnim);
       idle.play();
-
+      fallbackImg.remove();
       waveOnLoad();
     },
     undefined, // We don't need this function
@@ -170,8 +178,8 @@ function resizeRendererToDisplaySize(renderer) {
     return needResize;
 }
      
-window.addEventListener('click', () => playOnClick());
-window.addEventListener('touchend', () => playOnClick());
+// window.addEventListener('click', () => playOnClick());
+// window.addEventListener('touchend', () => playOnClick());
 
 function playOnClick() {
   console.log('~~~~ here', possibleAnims);
@@ -179,18 +187,58 @@ function playOnClick() {
   playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
 }
 
+//CUSTOM
 function waveOnLoad() {
-  const idx = possibleAnims.findIndex(animation => animation.name === "wave");
-  playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-  showTooltip();
+  const path = window.location.pathname;
+  const input = document.getElementById('landing')?.value;
+  if(path === input && !currentlyAnimating){
+    const idx = possibleAnims.findIndex(animation => animation.name === "wave");
+    playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+    showTooltip('Welcome to Sulphur Labs', 2000);
+  }
+  const inputPage = document.getElementById('pricing')?.value;
+  if(path === inputPage && !currentlyAnimating){
+    console.log(possibleAnims);
+    const idx = possibleAnims.findIndex(animation => animation.name === "swingdance");
+    playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+    showTooltip('Offer unlocked for you', 2000);
+  }
 }
+
+window.addEventListener('hashchange', function() {
+  const path = window.location.hash;
+  const input = document.getElementById('milestone')?.value;
+  console.log(path, input, path === `#${input}`);
+  if(path === `#${input}` && !currentlyAnimating){
+    const idx = possibleAnims.findIndex(animation => animation.name === "golf");
+    playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+    showTooltip('We have something new, checkout!', 2000);
+  }
+});
+
+let isPlayed = false;
+
+window.addEventListener('scroll', function() {
+  const scrollTop = window.scrollY || window.pageYOffset;
+  const docHeight = document.documentElement.scrollHeight;
+  const winHeight = window.innerHeight;
+  const scrollPercent = (scrollTop / (docHeight - winHeight)) * 100;
+
+  const input = document.getElementById('scroll')?.value;
+  if(Number(scrollPercent)>Number(input) && !isPlayed && !currentlyAnimating){
+    isPlayed = true;
+    const idx = possibleAnims.findIndex(animation => animation.name === "shrug");
+    playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+    showTooltip('Finding something?', 2000);
+  }
+});
         
-function showTooltip() {
+function showTooltip(message, time) {
     const tooltip = document.createElement('div');
     tooltip.id = 'tooltip';
-    tooltip.innerHTML = 'Welcome to Sulphur Labs';
+    tooltip.innerHTML = message;
 
-    tooltip.style.position = 'absolute';
+    tooltip.style.position = 'fixed';
     tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
     tooltip.style.color = '#fff';
     tooltip.style.padding = '8px';
@@ -201,11 +249,11 @@ function showTooltip() {
     tooltip.style.whiteSpace = 'nowrap';
     tooltip.style.zIndex = '10'
     // Arrow style for the tooltip using a pseudo element
-    tooltip.style.position = 'absolute';
+    tooltip.style.position = 'fixed';
     tooltip.style.setProperty('--tooltip-arrow-size', '5px');
     tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(0, 0, 0, 0.75)')
     const arrow = document.createElement('div');
-    arrow.style.position = 'absolute';
+    arrow.style.position = 'fixed';
     arrow.style.width = '0';
     arrow.style.height = '0';
     arrow.style.borderLeft = '5px solid transparent';
@@ -219,16 +267,16 @@ function showTooltip() {
     document.body.appendChild(tooltip);
     const canvas = document.getElementById('threejs-canvas');
     const canvasBounds = canvas.getBoundingClientRect();
-    console.log(canvasBounds);
     tooltip.style.left = (canvasBounds.left + 80) + 'px';
     tooltip.style.top = (canvasBounds.top + 56) + 'px';
     tooltip.style.display = 'block';
     setTimeout(() => {
         tooltip.style.display = 'none';
-    }, 5000);
+    }, time);
 }
 
 function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
+  currentlyAnimating = true;
   const to = finalAnim.clip;
   to.setLoop(THREE.LoopOnce);
   to.reset();
@@ -243,7 +291,7 @@ function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
   
 document.addEventListener('mousemove', function(e) {
     var mousecoords = getMousePos(e);
-    if(neck && waist) {
+    if(neck && waist && !currentlyAnimating) {
       moveJoint(mousecoords, neck, 50);
       moveJoint(mousecoords, waist, 30);
     }
@@ -252,6 +300,7 @@ document.addEventListener('mousemove', function(e) {
 function getMousePos(e) {
     return { x: e.clientX, y: e.clientY};
 }
+
 function moveJoint(mouse, joint, degreeLimit) {
     let degrees = getMouseDegrees(mouse.x, mouse.y, degreeLimit);
     joint.rotation.y = THREE.Math.degToRad(degrees.x);
@@ -269,33 +318,35 @@ function getMouseDegrees(x, y, degreeLimit) {
   let w = { x: window.innerWidth, y: window.innerHeight };
 
   // Left (Rotates neck left between 0 and -degreeLimit)
+
+  const xRef = (w.x - 160);
+  const yRef = (w.y - 190);
   
-   // 1. If cursor is in the left half of screen
-  if (x <= w.x / 2) {
-    // 2. Get the difference between middle of screen and cursor position
-    xdiff = w.x / 2 - x;  
-    // 3. Find the percentage of that difference (percentage toward edge of screen)
-    xPercentage = (xdiff / (w.x / 2)) * 100;
-    // 4. Convert that to a percentage of the maximum rotation we allow for the neck
+  if (x <= xRef) {
+    // Get the difference between model and cursor position
+    xdiff = xRef - x;  
+    // Find the percentage of that difference (percentage toward edge of screen)
+    xPercentage = (xdiff / xRef) * 100;
+    // Convert that to a percentage of the maximum rotation we allow for the neck
     dx = ((degreeLimit * xPercentage) / 100) * -1; }
 // Right (Rotates neck right between 0 and degreeLimit)
-  if (x >= w.x / 2) {
-    xdiff = x - w.x / 2;
-    xPercentage = (xdiff / (w.x / 2)) * 100;
+  if (x >= xRef) {
+    xdiff = x - xRef;
+    xPercentage = (xdiff / xRef) * 100;
     dx = (degreeLimit * xPercentage) / 100;
   }
   // Up (Rotates neck up between 0 and -degreeLimit)
-  if (y <= w.y / 2) {
-    ydiff = w.y / 2 - y;
-    yPercentage = (ydiff / (w.y / 2)) * 100;
+  if (y <= yRef) {
+    ydiff = yRef - y;
+    yPercentage = (ydiff / yRef) * 100;
     // Note that I cut degreeLimit in half when she looks up
     dy = (((degreeLimit * 0.5) * yPercentage) / 100) * -1;
     }
   
   // Down (Rotates neck down between 0 and degreeLimit)
-  if (y >= w.y / 2) {
-    ydiff = y - w.y / 2;
-    yPercentage = (ydiff / (w.y / 2)) * 100;
+  if (y >= yRef) {
+    ydiff = y - yRef;
+    yPercentage = (ydiff / (yRef)) * 100;
     dy = (degreeLimit * yPercentage) / 100;
   }
   return { x: dx, y: dy };
