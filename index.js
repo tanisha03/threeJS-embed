@@ -191,7 +191,7 @@ function playOnClick() {
 function waveOnLoad() {
   const path = window.location.pathname;
   const input = document.getElementById('landing')?.value;
-  if(path === input && !currentlyAnimating){
+  if(path.includes(input) && !currentlyAnimating){
     const idx = possibleAnims.findIndex(animation => animation.name === "wave");
     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
     showTooltip('Welcome to Sulphur Labs', 2000);
