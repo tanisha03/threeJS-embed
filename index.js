@@ -257,7 +257,7 @@ window.addEventListener('hashchange', function() {
   if(path === `#${input}` && !currentlyAnimating){
     const idx = possibleAnims.findIndex(animation => animation.name === "golf");
     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('We have something new, checkout!', 5000);
+    showTooltip('Checkout our offers!', 5000);
   }
 });
 
