@@ -15,25 +15,70 @@ let scene,
 
 init();
 
+const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
 function init() {
-  
+  const isMobile = window.matchMedia("(max-width: 767px)").matches;
   const MODEL_PATH = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1376484/stacy_lightweight.glb';
-  const MODEL_IMAGE = 'https://i.ibb.co/PYgxQb1/Screenshot-2024-09-24-at-8-21-23-PM-removebg-preview.png';
-  const fallbackImg = document.createElement('img');
-  fallbackImg.src = MODEL_IMAGE;
-  fallbackImg.style.position = 'fixed';
-  fallbackImg.style.bottom = '52px';
-  fallbackImg.style.right = '72px';
-  fallbackImg.style.height = '176px';
-  fallbackImg.style.width = '160px';
+
+  const fallbackLoader = document.createElement('div');
+  fallbackLoader.id = 'loader';
+  document.body.appendChild(fallbackLoader);
+  
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  const css = `
+    #loader {
+      width: 60px;
+      height: 60px;
+      position: fixed;
+      bottom: 36px;
+      right: 36px;
+      --colorA: #b78eff;
+      
+      &::before,
+      &::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          border-top: 4px solid #fff;
+          filter: 
+              drop-shadow(0 0 2px var(--colorA))
+              drop-shadow(0 0 5px var(--colorA))
+              drop-shadow(0 0 10px var(--colorA))
+              drop-shadow(0 0 20px var(--colorA));
+          animation: rotate 3s infinite linear;
+      }
+      
+      &::after {
+          --colorA: #ffec41;
+          animation-delay: -1.5s;
+      }
+  }
+
+  @keyframes rotate {
+      100% {
+          transform: rotate(360deg);
+      }
+  }
+  `;
+  style.appendChild(document.createTextNode(css));
+  document.head.appendChild(style);
+
   const canvas = document.createElement('canvas');
   canvas.id = 'threejs-canvas';
   document.body.appendChild(canvas);
   canvas.style.position = 'fixed';
-  canvas.style.bottom = '0';
-  canvas.style.right = '0';
-  canvas.style.height = '320px';
-  canvas.style.width = '320px';
+  canvas.style.bottom = '-40px';
+  canvas.style.right = isMobile ? '-76px' : '-60px';
+  canvas.style.height = isMobile ? '260px' : '280px';
+  canvas.style.width = isMobile ? '260px' : '280px';
     
   scene = new THREE.Scene();
   scene.background = null;
@@ -42,7 +87,6 @@ function init() {
   renderer.shadowMap.enabled = true;
   renderer.setPixelRatio(window.devicePixelRatio);
   document.body.appendChild(renderer.domElement);
-  document.body.appendChild(fallbackImg);
   
     camera = new THREE.PerspectiveCamera(
     50,
@@ -110,7 +154,8 @@ function init() {
       idleAnim.tracks.splice(9, 3);
       idle = mixer.clipAction(idleAnim);
       idle.play();
-      fallbackImg.remove();
+      fallbackLoader.remove();
+      appendInput();
       waveOnLoad();
     },
     undefined, // We don't need this function
@@ -194,14 +239,14 @@ function waveOnLoad() {
   if(path.includes(input) && !currentlyAnimating){
     const idx = possibleAnims.findIndex(animation => animation.name === "wave");
     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('Welcome to Sulphur Labs', 2000);
+    showTooltip('Welcome to Sulphur Labs', 5000);
   }
   const inputPage = document.getElementById('pricing')?.value;
   if(path.includes(inputPage) && !currentlyAnimating){
     console.log(possibleAnims);
     const idx = possibleAnims.findIndex(animation => animation.name === "swingdance");
     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('Offer unlocked for you', 2000);
+    showTooltip('Offer unlocked for you', 5000);
   }
 }
 
@@ -212,7 +257,7 @@ window.addEventListener('hashchange', function() {
   if(path === `#${input}` && !currentlyAnimating){
     const idx = possibleAnims.findIndex(animation => animation.name === "golf");
     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('We have something new, checkout!', 2000);
+    showTooltip('We have something new, checkout!', 5000);
   }
 });
 
@@ -229,11 +274,142 @@ window.addEventListener('scroll', function() {
     isPlayed = true;
     const idx = possibleAnims.findIndex(animation => animation.name === "shrug");
     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('Finding something?', 2000);
+    showTooltip('Finding something?', 5000);
   }
 });
+
+function appendInput() {
+  // Create an input element (rounded input box)
+  const input = document.createElement('input');
+  input.id = 'input';
+  input.placeholder = 'Ask me anything';  // Set the input value to the message
+
+  // Styling the input to make it look like a rounded box
+  input.style.position = 'fixed';
+  input.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+  input.style.color = '#000';
+  input.style.padding = '8px 16px';
+  input.style.borderRadius = '20px';  // Rounded corners
+  input.style.fontSize = '14px';
+  input.style.border = 'none';        // Remove default input border
+  input.style.outline = 'none';       // Remove input focus outline
+  input.style.display = 'none';
+  input.style.whiteSpace = 'nowrap';
+  input.style.zIndex = '10';
+
+  // Positioning of the input box
+  const canvas = document.getElementById('threejs-canvas');
+  const canvasBounds = canvas.getBoundingClientRect();
+  input.style.left = (canvasBounds.left - 60) + 'px';
+  input.style.top = (canvasBounds.top + 160) + 'px';
+
+  // Add the input element to the body
+  document.body.appendChild(input);
+
+  // Show the input box for the given time, then hide it
+  input.style.display = 'block';
+  appendChatWindow();
+
+  input.addEventListener('focus', () => showChatWindow());
+}
+
+function showInput(){
+  const input = document.getElementById('input');
+  input.style.display = 'block';
+}
+
+function hideInput(){
+  const input = document.getElementById('input');
+  input.style.display = 'none';
+}
+
+function appendChatWindow() {
+  // Create a container for the chat window
+  const chatWindow = document.createElement('div');
+  chatWindow.id = 'chatWindow';
+
+  // Styling the chat window to look like a small chat box
+  chatWindow.style.position = 'fixed';
+  chatWindow.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+  chatWindow.style.color = '#fff';
+  chatWindow.style.padding = '16px';
+  chatWindow.style.borderRadius = '15px';  // Rounded corners
+  chatWindow.style.fontSize = '14px';
+  chatWindow.style.width = '250px';        // Small chat window width
+  chatWindow.style.height = '300px';       // Fixed chat window height
+  chatWindow.style.bottom = '20px';        // Position it at the bottom of the screen
+  chatWindow.style.right = '20px';         // Align it to the bottom right corner
+  chatWindow.style.zIndex = '1000';
+  chatWindow.style.boxShadow = '0px 4px 10px rgba(0, 0, 0, 0.3)'; // Adding shadow for effect
+
+  // Create a header for the chat window
+  const chatHeader = document.createElement('div');
+  chatHeader.style.backgroundColor = 'rgba(0, 0, 0, 0.25)';
+  chatHeader.style.padding = '10px';
+  chatHeader.style.borderRadius = '10px 10px 0 0';
+  chatHeader.style.fontWeight = 'bold';
+  chatHeader.style.textAlign = 'center';
+  chatHeader.innerText = 'Chat Window';
+
+  // Create a close button inside the chat header
+  const closeButton = document.createElement('span');
+  closeButton.innerHTML = '×';  // Close (X) symbol
+  closeButton.style.cursor = 'pointer';
+  closeButton.style.position = 'absolute';
+  closeButton.style.right = '10px';
+  closeButton.style.top = '5px';
+  closeButton.style.fontSize = '18px';
+  closeButton.style.color = '#fff';
+
+  // Close chat window when close button is clicked
+  closeButton.onclick = function() {
+      chatWindow.style.display = 'none';
+  };
+
+  // Append the close button to the header
+  chatHeader.appendChild(closeButton);
+
+  // Create a message area for displaying chat content
+  const messageArea = document.createElement('div');
+  messageArea.style.backgroundColor = '#222';
+  messageArea.style.padding = '10px';
+  messageArea.style.height = 'calc(100% - 100px)';  // Leave room for input
+  messageArea.style.overflowY = 'auto';
+  messageArea.style.borderRadius = '0 0 10px 10px';
+  messageArea.style.marginBottom = '10px';
+  messageArea.innerHTML = `<p>hello</p>`;  // Display the initial message
+
+  // Create an input for the chat window
+  const inputBox = document.createElement('input');
+  inputBox.type = 'text';
+  inputBox.placeholder = 'Type a message...';
+  inputBox.style.width = '100%';
+  inputBox.style.padding = '10px';
+  inputBox.style.borderRadius = '5px';
+  inputBox.style.border = 'none';
+  inputBox.style.outline = 'none';
+  inputBox.style.backgroundColor = '#444';
+  inputBox.style.color = '#fff';
+  inputBox.style.boxSizing = 'border-box';
+
+  // Append the header, message area, and input to the chat window
+  chatWindow.appendChild(chatHeader);
+  chatWindow.appendChild(messageArea);
+  chatWindow.appendChild(inputBox);
+
+  // Add the chat window to the body
+  document.body.appendChild(chatWindow);
+
+  chatWindow.style.display = 'none';
+}
+
+function showChatWindow(){
+  const chat = document.getElementById('chatWindow');
+  chat.style.display = 'block';
+}
         
 function showTooltip(message, time) {
+    hideInput();
     const tooltip = document.createElement('div');
     tooltip.id = 'tooltip';
     tooltip.innerHTML = message;
@@ -253,25 +429,26 @@ function showTooltip(message, time) {
     tooltip.style.setProperty('--tooltip-arrow-size', '5px');
     tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(0, 0, 0, 0.75)')
     const arrow = document.createElement('div');
-    arrow.style.position = 'fixed';
+    arrow.style.position = 'absolute';
     arrow.style.width = '0';
     arrow.style.height = '0';
     arrow.style.borderLeft = '5px solid transparent';
     arrow.style.borderRight = '5px solid transparent';
-    arrow.style.borderTop = '5px solid rgba(0, 0, 0, 0.75)';
-    arrow.style.bottom = '-5px';
-    arrow.style.left = '50%';
-    arrow.style.transform = 'translateX(-50%)';
+    arrow.style.borderTop = '6px solid rgba(0, 0, 0, 0.75)';
+    arrow.style.top = '50%';
+    arrow.style.right = '-7px';
+    arrow.style.transform = 'rotate(-90deg)';
     tooltip.appendChild(arrow);
 
     document.body.appendChild(tooltip);
     const canvas = document.getElementById('threejs-canvas');
     const canvasBounds = canvas.getBoundingClientRect();
-    tooltip.style.left = (canvasBounds.left + 80) + 'px';
-    tooltip.style.top = (canvasBounds.top + 56) + 'px';
+    tooltip.style.left = (canvasBounds.left - 48) + 'px';
+    tooltip.style.top = (canvasBounds.top + 120) + 'px';
     tooltip.style.display = 'block';
     setTimeout(() => {
         tooltip.style.display = 'none';
+        showInput();
     }, time);
 }
 
@@ -288,14 +465,16 @@ function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
     currentlyAnimating = false;
   }, to._clip.duration * 1000 -((tSpeed + fSpeed) * 1000));
 }
-  
-document.addEventListener('mousemove', function(e) {
+ 
+if(!isMobile){
+  document.addEventListener('mousemove', function(e) {
     var mousecoords = getMousePos(e);
     if(neck && waist && !currentlyAnimating) {
       moveJoint(mousecoords, neck, 50);
       moveJoint(mousecoords, waist, 30);
     }
-});
+  });
+}
 
 function getMousePos(e) {
     return { x: e.clientX, y: e.clientY};
