@@ -1,3 +1,96 @@
+/*
+CONFIG for model
+[
+  {
+    type: 'onLoad' | 'onSectionChange' | 'scroll',
+    scrollValue: 70,
+    pagePath: '/',
+    animation: 'wave' | 'dance',
+    text: '',
+    time: '',
+    cta: []
+  }
+]
+
+CURRENT CONFIG:
+[
+  {
+    type: 'onLoad',
+    pagePath: '/',
+    animation: 'wave',
+    text: 'Welcome to Sulphur Labs',
+    time: 5000,
+    cta: []
+  },
+  {
+    type: 'onLoad',
+    pagePath: '/pricing.html',
+    animation: 'wave',
+    text: 'Offer available for you',
+    time: 5000,
+    cta: []
+  },
+  {
+    type: 'onSectionChange',
+    pagePath: '#section-3',
+    animation: 'wave',
+    text: 'Want to know more?',
+    time: 5000,
+    cta: []
+  },
+  {
+    type: 'scroll',
+    scrollValue: 70,
+    pagePath: '/',
+    animation: 'wave',
+    text: 'Download this below',
+    time: 5000,
+    cta: []
+  }
+]
+*/
+
+
+const CONFIG = [
+  {
+    type: 'onLoad',
+    pagePath: '/',
+    animation: 'wave',
+    text: 'Welcome to Sulphur Labs',
+    time: 3000,
+    cta: []
+  },
+  {
+    type: 'onLoad',
+    pagePath: '/pricing.html',
+    animation: 'swingdance',
+    text: 'Offer available for you',
+    time: 3000,
+    cta: []
+  },
+  {
+    type: 'onSectionChange',
+    pagePath: '#section-3',
+    animation: 'golf',
+    text: 'Want to know more?',
+    time: 3000,
+    cta: []
+  },
+  {
+    type: 'scroll',
+    scrollValue: 70,
+    pagePath: '/',
+    animation: 'shrug',
+    text: 'Download this below',
+    time: 3000,
+    cta: [{
+      text: 'Download',
+      onClick: () => window.open('file.docx')
+    }]
+  }
+];
+
+
 (function() {
 // Set our main variables
 let scene,  
@@ -156,7 +249,8 @@ function init() {
       idle.play();
       fallbackLoader.remove();
       appendInput();
-      waveOnLoad();
+      triggerConfig();
+      // waveOnLoad();
     },
     undefined, // We don't need this function
     function(error) {
@@ -226,57 +320,103 @@ function resizeRendererToDisplaySize(renderer) {
 // window.addEventListener('click', () => playOnClick());
 // window.addEventListener('touchend', () => playOnClick());
 
-function playOnClick() {
-  console.log('~~~~ here', possibleAnims);
-  let anim = Math.floor(Math.random() * possibleAnims.length) + 0;
-  playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
+// function playOnClick() {
+//   console.log('~~~~ here', possibleAnims);
+//   let anim = Math.floor(Math.random() * possibleAnims.length) + 0;
+//   playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
+// }
+
+function triggerConfig() {
+  CONFIG.map(config => {
+    switch(config.type){
+      case 'onLoad':
+        const path = window.location.pathname;
+        if(path === config.pagePath && !currentlyAnimating){
+          const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
+          playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+          showTooltip(config.text, config.time, config.cta);
+        }
+        break;
+      case 'onSectionChange':
+        window.addEventListener('hashchange', function() {
+          const path = window.location.hash;
+          const input = document.getElementById('milestone')?.value;
+          if(path === `#${input}` && !currentlyAnimating){
+            const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
+            playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+            showTooltip(config.text, config.time, config.cta);
+          }
+        });
+        break;
+      case 'scroll':
+        window.addEventListener('scroll', function() {
+          const scrollTop = window.scrollY || window.pageYOffset;
+          const docHeight = document.documentElement.scrollHeight;
+          const winHeight = window.innerHeight;
+          const scrollPercent = (scrollTop / (docHeight - winHeight)) * 100;
+          const path = window.location.pathname;
+        
+          if(path === config.pagePath && Number(scrollPercent)>Number(config.scrollValue) && !currentlyAnimating){
+            const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
+            playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+            showTooltip(config.text, config.time, config.cta);
+          }
+        });
+        break;
+      default:
+        break;
+    }
+  })
 }
 
 //CUSTOM
-function waveOnLoad() {
-  const path = window.location.pathname;
-  const input = document.getElementById('landing')?.value;
-  if(path.includes(input) && !currentlyAnimating){
-    const idx = possibleAnims.findIndex(animation => animation.name === "wave");
-    playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('Welcome to Sulphur Labs', 5000);
-  }
-  const inputPage = document.getElementById('pricing')?.value;
-  if(path.includes(inputPage) && !currentlyAnimating){
-    console.log(possibleAnims);
-    const idx = possibleAnims.findIndex(animation => animation.name === "swingdance");
-    playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('Offer unlocked for you', 5000);
-  }
-}
+// function waveOnLoad() {
+//   const path = window.location.pathname;
+//   const input = document.getElementById('landing')?.value;
+//   if(path.includes(input) && !currentlyAnimating){
+//     const idx = possibleAnims.findIndex(animation => animation.name === "wave");
+//     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+//     showTooltip('Welcome to Sulphur Labs', 5000);
+//   }
+//   const inputPage = document.getElementById('pricing')?.value;
+//   if(path.includes(inputPage) && !currentlyAnimating){
+//     console.log(possibleAnims);
+//     const idx = possibleAnims.findIndex(animation => animation.name === "swingdance");
+//     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+//     showTooltip('Offer unlocked for you', 5000);
+//   }
+// }
 
-window.addEventListener('hashchange', function() {
-  const path = window.location.hash;
-  const input = document.getElementById('milestone')?.value;
-  console.log(path, input, path === `#${input}`);
-  if(path === `#${input}` && !currentlyAnimating){
-    const idx = possibleAnims.findIndex(animation => animation.name === "golf");
-    playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('Checkout our offers!', 5000);
-  }
-});
+// window.addEventListener('hashchange', function() {
+//   const path = window.location.hash;
+//   const input = document.getElementById('milestone')?.value;
+//   console.log(path, input, path === `#${input}`);
+//   if(path === `#${input}` && !currentlyAnimating){
+//     const idx = possibleAnims.findIndex(animation => animation.name === "golf");
+//     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+//     showTooltip('Checkout our offers!', 5000);
+//   }
+// });
 
-let isPlayed = false;
+// let isPlayed = false;
 
-window.addEventListener('scroll', function() {
-  const scrollTop = window.scrollY || window.pageYOffset;
-  const docHeight = document.documentElement.scrollHeight;
-  const winHeight = window.innerHeight;
-  const scrollPercent = (scrollTop / (docHeight - winHeight)) * 100;
+// window.addEventListener('scroll', function() {
+//   const scrollTop = window.scrollY || window.pageYOffset;
+//   const docHeight = document.documentElement.scrollHeight;
+//   const winHeight = window.innerHeight;
+//   const scrollPercent = (scrollTop / (docHeight - winHeight)) * 100;
 
-  const input = document.getElementById('scroll')?.value;
-  if(Number(scrollPercent)>Number(input) && !isPlayed && !currentlyAnimating){
-    isPlayed = true;
-    const idx = possibleAnims.findIndex(animation => animation.name === "shrug");
-    playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-    showTooltip('Finding something?', 5000);
-  }
-});
+//   const input = document.getElementById('scroll')?.value;
+//   if(Number(scrollPercent)>Number(input) && !isPlayed && !currentlyAnimating){
+//     isPlayed = true;
+//     const idx = possibleAnims.findIndex(animation => animation.name === "shrug");
+//     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
+//     showTooltip('Finding something?', 5000, [{
+//       text: 'Download',
+//       onClick: () => window.open('file.docx')
+//     }]);
+//   }
+// });
 
 function appendInput() {
   // Create an input element (rounded input box)
@@ -408,26 +548,30 @@ function showChatWindow(){
   chat.style.display = 'block';
 }
         
-function showTooltip(message, time) {
+function showTooltip(message, time, ctaList) {
     hideInput();
+    const tooltipContainer = document.createElement('div');
+    tooltipContainer.style.position = 'fixed';
+
     const tooltip = document.createElement('div');
     tooltip.id = 'tooltip';
     tooltip.innerHTML = message;
+    tooltipContainer.appendChild(tooltip);
 
-    tooltip.style.position = 'fixed';
+    tooltip.style.position = 'relative';
     tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
     tooltip.style.color = '#fff';
     tooltip.style.padding = '8px';
     tooltip.style.borderRadius = '5px';
     tooltip.style.fontSize = '14px';
-    tooltip.style.display = 'none';
+    // tooltip.style.display = 'none';s
     tooltip.style.pointerEvents = 'none';
     tooltip.style.whiteSpace = 'nowrap';
     tooltip.style.zIndex = '10'
     // Arrow style for the tooltip using a pseudo element
-    tooltip.style.position = 'fixed';
     tooltip.style.setProperty('--tooltip-arrow-size', '5px');
     tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(0, 0, 0, 0.75)')
+    tooltip.style.margin = '4px 0'
     const arrow = document.createElement('div');
     arrow.style.position = 'absolute';
     arrow.style.width = '0';
@@ -440,14 +584,30 @@ function showTooltip(message, time) {
     arrow.style.transform = 'rotate(-90deg)';
     tooltip.appendChild(arrow);
 
-    document.body.appendChild(tooltip);
+    if(ctaList){
+      const ctaContainer = document.createElement('div');
+      ctaList.map(ctaItem => {
+        const btn = document.createElement('button');
+        btn.innerHTML = ctaItem.text;
+        btn.style.borderRadius = '4px';
+        btn.style.border = '1px solid black';
+        btn.style.background = '#D9FBE1';
+        btn.style.padding = '4px 8px';
+        btn.addEventListener('click', ctaItem.onClick);
+        ctaContainer.appendChild(btn);
+      })
+      tooltipContainer.appendChild(ctaContainer);
+    }
+
+    document.body.appendChild(tooltipContainer);
     const canvas = document.getElementById('threejs-canvas');
     const canvasBounds = canvas.getBoundingClientRect();
-    tooltip.style.left = (canvasBounds.left - 48) + 'px';
-    tooltip.style.top = (canvasBounds.top + 120) + 'px';
-    tooltip.style.display = 'block';
+    tooltipContainer.style.left = (canvasBounds.left - 48) + 'px';
+    tooltipContainer.style.top = (canvasBounds.top + 120) + 'px';
+    tooltipContainer.style.display = 'block';
+
     setTimeout(() => {
-        tooltip.style.display = 'none';
+        tooltipContainer.remove();
         showInput();
     }, time);
 }
