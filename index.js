@@ -54,7 +54,7 @@ CURRENT CONFIG:
 const CONFIG = [
   {
     type: 'onLoad',
-    pagePath: '/threeJS-embed',
+    pagePath: '/threeJS-embed/',
     match: 'exact',
     animation: 'wave',
     text: 'Welcome to Sulphur Labs',
