@@ -54,35 +54,38 @@ CURRENT CONFIG:
 const CONFIG = [
   {
     type: 'onLoad',
-    pagePath: '/',
+    pagePath: '/threeJS-embed',
+    match: 'exact',
     animation: 'wave',
     text: 'Welcome to Sulphur Labs',
-    time: 3000,
+    time: 2000,
     cta: []
   },
   {
     type: 'onLoad',
     pagePath: '/pricing.html',
+    match: 'includes',
     animation: 'swingdance',
     text: 'Offer available for you',
-    time: 3000,
+    time: 2000,
     cta: []
   },
   {
     type: 'onSectionChange',
-    pagePath: '#section-3',
+    pagePath: 'milestone-4',
     animation: 'golf',
     text: 'Want to know more?',
-    time: 3000,
+    time: 2000,
     cta: []
   },
   {
     type: 'scroll',
     scrollValue: 70,
-    pagePath: '/',
+    pagePath: '/pricing.html',
+    match: 'includes',
     animation: 'shrug',
     text: 'Download this below',
-    time: 3000,
+    time: 2000,
     cta: [{
       text: 'Download',
       onClick: () => window.open('file.docx')
@@ -331,20 +334,19 @@ function triggerConfig() {
     switch(config.type){
       case 'onLoad':
         const path = window.location.pathname;
-        if(path === config.pagePath && !currentlyAnimating){
+        if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
           const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-          playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-          showTooltip(config.text, config.time, config.cta);
+          showTooltip(config.text, config.time, config.cta, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
         }
         break;
       case 'onSectionChange':
         window.addEventListener('hashchange', function() {
           const path = window.location.hash;
           const input = document.getElementById('milestone')?.value;
-          if(path === `#${input}` && !currentlyAnimating){
+          console.log(path, input, config.pagePath);
+          if(path === `#${config.pagePath}`){
             const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-            playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-            showTooltip(config.text, config.time, config.cta);
+            showTooltip(config.text, config.time, config.cta, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
           }
         });
         break;
@@ -356,10 +358,9 @@ function triggerConfig() {
           const scrollPercent = (scrollTop / (docHeight - winHeight)) * 100;
           const path = window.location.pathname;
         
-          if(path === config.pagePath && Number(scrollPercent)>Number(config.scrollValue) && !currentlyAnimating){
+          if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath)) && Number(scrollPercent)>Number(config.scrollValue)){
             const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-            playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-            showTooltip(config.text, config.time, config.cta);
+            showTooltip(config.text, config.time, config.cta, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
           }
         });
         break;
@@ -446,10 +447,14 @@ function appendInput() {
   // Add the input element to the body
   document.body.appendChild(input);
 
-  // Show the input box for the given time, then hide it
-  input.style.display = 'block';
   appendChatWindow();
 
+  // Show the input box for the given time, then hide it
+  if(currentlyAnimating){
+    showInput();
+  } else{
+    hideInput();
+  }
   input.addEventListener('focus', () => showChatWindow());
 }
 
@@ -548,7 +553,10 @@ function showChatWindow(){
   chat.style.display = 'block';
 }
         
-function showTooltip(message, time, ctaList) {
+function showTooltip(message, time, ctaList, animationCB) {
+    if(currentlyAnimating) return;
+    animationCB();
+    console.log('!!!!!!', message, currentlyAnimating);
     hideInput();
     const tooltipContainer = document.createElement('div');
     tooltipContainer.style.position = 'fixed';
@@ -608,6 +616,7 @@ function showTooltip(message, time, ctaList) {
 
     setTimeout(() => {
         tooltipContainer.remove();
+        currentlyAnimating = false;
         showInput();
     }, time);
 }
@@ -622,7 +631,6 @@ function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
   setTimeout(function() {
     from.enabled = true;
     to.crossFadeTo(from, tSpeed, true);
-    currentlyAnimating = false;
   }, to._clip.duration * 1000 -((tSpeed + fSpeed) * 1000));
 }
  
