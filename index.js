@@ -67,8 +67,11 @@ const CONFIG = [
     match: 'includes',
     animation: 'swingdance',
     text: 'Offer available for you',
-    time: 2000,
-    cta: []
+    hasClose: true,
+    cta: [{
+      text: 'Download',
+      onClick: () => window.open('file.docx')
+    }]
   },
   {
     type: 'onSectionChange',
@@ -84,12 +87,10 @@ const CONFIG = [
     pagePath: '/pricing.html',
     match: 'includes',
     animation: 'shrug',
-    text: 'Download this below',
-    time: 2000,
-    cta: [{
-      text: 'Download',
-      onClick: () => window.open('file.docx')
-    }]
+    timerCountdown: 120,
+    innerHTML: `<img src="https://cdn.prod.website-files.com/61813b089ddadb7ca3b7468d/6391c522fe77f1de7bad14a2_pop-up-example-6.jpg" style="width:160px;height:100px;border-radius:10px"/>`,
+    hasClose: true,
+    cta: []
   }
 ];
 
@@ -336,7 +337,11 @@ function triggerConfig() {
         const path = window.location.pathname;
         if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
           const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-          showTooltip(config.text, config.time, config.cta, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+          if(config.innerHTML){
+            showOverlay(config.innerHTML, config.time, config.cta, config.hasClose, config.timerCountdown, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+          } else {
+            showTooltip(config.text, config.time, config.cta, config.hasClose, config.timerCountdown, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+          }
         }
         break;
       case 'onSectionChange':
@@ -346,7 +351,11 @@ function triggerConfig() {
           console.log(path, input, config.pagePath);
           if(path === `#${config.pagePath}`){
             const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-            showTooltip(config.text, config.time, config.cta, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+            if(config.innerHTML){
+              showOverlay(config.innerHTML, config.time, config.cta,  config.hasClose, config.timerCountdown,() => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+            } else {
+              showTooltip(config.text, config.time, config.cta, config.hasClose, config.timerCountdown, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+            }
           }
         });
         break;
@@ -360,7 +369,11 @@ function triggerConfig() {
         
           if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath)) && Number(scrollPercent)>Number(config.scrollValue)){
             const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-            showTooltip(config.text, config.time, config.cta, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+            if(config.innerHTML){
+              showOverlay(config.innerHTML, config.time, config.cta,  config.hasClose, config.timerCountdown,() => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+            } else {
+              showTooltip(config.text, config.time, config.cta, config.hasClose, config.timerCountdown, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
+            }
           }
         });
         break;
@@ -553,10 +566,9 @@ function showChatWindow(){
   chat.style.display = 'block';
 }
         
-function showTooltip(message, time, ctaList, animationCB) {
+function showTooltip(message, time, ctaList, hasClose, timerCountdown, animationCB) {
     if(currentlyAnimating) return;
     animationCB();
-    console.log('!!!!!!', message, currentlyAnimating);
     hideInput();
     const tooltipContainer = document.createElement('div');
     tooltipContainer.style.position = 'fixed';
@@ -592,6 +604,65 @@ function showTooltip(message, time, ctaList, animationCB) {
     arrow.style.transform = 'rotate(-90deg)';
     tooltip.appendChild(arrow);
 
+    if(hasClose){
+      const closeBtn = document.createElement('button');
+      closeBtn.style.background = 'white';
+      closeBtn.style.padding = '2px';
+      closeBtn.style.border = '1px solid black';
+      closeBtn.style.position = 'absolute';
+      closeBtn.style.top = '-4px';
+      closeBtn.style.right = '-4px';
+      closeBtn.style.width = '16px';
+      closeBtn.style.height = '16px';
+      closeBtn.style.fontSize = '10px';
+      closeBtn.style.borderRadius = '50%';
+      closeBtn.style.zIndex = '99';
+      closeBtn.innerHTML = 'X';
+      closeBtn.addEventListener('click', () => {
+        tooltipContainer.remove();
+        currentlyAnimating = false;
+        showInput();
+      })
+      tooltipContainer.appendChild(closeBtn);
+    }
+
+    if(timerCountdown){
+      const timer = document.createElement('div');
+      timer.style.textAlign = 'center';
+      timer.style.padding = '2px 6px';
+      timer.style.color = '#ff0000';  
+      timer.style.fontSize = '12px';
+      timer.style.fontWeight = 'bold';
+      timer.style.position = 'absolute';
+      timer.style.top = '-8px';
+      timer.style.left = '-10px';
+      timer.style.borderRadius = '8px';
+      timer.style.zIndex = '99';
+      timer.style.background = 'white';
+      // timer.style.border = '1px solid black';
+  
+      function formatTime(seconds) {
+        let minutes = Math.floor(seconds / 60);  // Get the minutes
+        let secs = seconds % 60;  // Get the remaining seconds
+        return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  // Format as MM:SS
+      }
+    
+      function updateTimer() {
+          if (timerCountdown > 0) {
+              timer.innerText = `${formatTime(timerCountdown)}`;  // Display in MM:SS format
+              timerCountdown--;
+          } else {
+            tooltipContainer.remove();
+            currentlyAnimating = false;
+            showInput();
+          }
+      }
+    
+      // Update the timer every second
+      setInterval(updateTimer, 1000);
+      tooltipContainer.appendChild(timer);
+    } 
+
     if(ctaList){
       const ctaContainer = document.createElement('div');
       ctaList.map(ctaItem => {
@@ -614,11 +685,111 @@ function showTooltip(message, time, ctaList, animationCB) {
     tooltipContainer.style.top = (canvasBounds.top + 120) + 'px';
     tooltipContainer.style.display = 'block';
 
+    if(time){
+      setTimeout(() => {
+          tooltipContainer.remove();
+          currentlyAnimating = false;
+          showInput();
+      }, time);
+    }
+}
+
+function showOverlay(innerHTML, time, ctaList, hasClose, timerCountdown, animationCB) {
+  if(currentlyAnimating) return;
+  animationCB();
+  hideInput();
+  const tooltipContainer = document.createElement('div');
+  tooltipContainer.style.position = 'fixed';
+  tooltipContainer.innerHTML = innerHTML;
+
+  if(hasClose){
+    const closeBtn = document.createElement('button');
+    closeBtn.style.background = 'white';
+    closeBtn.style.padding = '2px';
+    closeBtn.style.border = '1px solid black';
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '-4px';
+    closeBtn.style.right = '-4px';
+    closeBtn.style.width = '16px';
+    closeBtn.style.height = '16px';
+    closeBtn.style.fontSize = '10px';
+    closeBtn.style.borderRadius = '50%';
+    closeBtn.style.zIndex = '99';
+    closeBtn.innerHTML = 'X';
+    closeBtn.addEventListener('click', () => {
+      tooltipContainer.remove();
+      currentlyAnimating = false;
+      showInput();
+    })
+    tooltipContainer.appendChild(closeBtn);
+  }
+
+  if(timerCountdown){
+    const timer = document.createElement('div');
+    timer.style.textAlign = 'center';
+    timer.style.padding = '2px 6px';
+    timer.style.color = '#ff0000';  
+    timer.style.fontSize = '12px';
+    timer.style.fontWeight = 'bold';
+    timer.style.position = 'absolute';
+    timer.style.top = '-8px';
+    timer.style.left = '-10px';
+    timer.style.borderRadius = '8px';
+    timer.style.zIndex = '99';
+    timer.style.background = 'white';
+    // timer.style.border = '1px solid black';
+
+    function formatTime(seconds) {
+      let minutes = Math.floor(seconds / 60);  // Get the minutes
+      let secs = seconds % 60;  // Get the remaining seconds
+      return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  // Format as MM:SS
+    }
+  
+    function updateTimer() {
+        if (timerCountdown > 0) {
+            timer.innerText = `${formatTime(timerCountdown)}`;  // Display in MM:SS format
+            timerCountdown--;
+        } else {
+          tooltipContainer.remove();
+          currentlyAnimating = false;
+          showInput();
+        }
+    }
+  
+    // Update the timer every second
+    setInterval(updateTimer, 1000);
+    tooltipContainer.appendChild(timer);
+  }  
+
+  if(ctaList){
+    const ctaContainer = document.createElement('div');
+    ctaList.map(ctaItem => {
+      const btn = document.createElement('button');
+      btn.innerHTML = ctaItem.text;
+      btn.style.borderRadius = '4px';
+      btn.style.border = '1px solid black';
+      btn.style.background = '#D9FBE1';
+      btn.style.padding = '4px 8px';
+      btn.addEventListener('click', ctaItem.onClick);
+      ctaContainer.appendChild(btn);
+    })
+    tooltipContainer.appendChild(ctaContainer);
+  }
+
+  document.body.appendChild(tooltipContainer);
+  const canvas = document.getElementById('threejs-canvas');
+  const canvasBounds = canvas.getBoundingClientRect();
+  tooltipContainer.style.left = (canvasBounds.left - 48) + 'px';
+  tooltipContainer.style.top = (canvasBounds.top + 120) + 'px';
+  tooltipContainer.style.display = 'block';
+
+  if(time){
     setTimeout(() => {
-        tooltipContainer.remove();
-        currentlyAnimating = false;
-        showInput();
+      tooltipContainer.remove();
+      currentlyAnimating = false;
+      showInput();
     }, time);
+  }
 }
 
 function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
