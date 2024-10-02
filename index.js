@@ -1,97 +1,122 @@
-/*
-CONFIG for model
-[
+const CONFIG = [
   {
-    type: 'onLoad' | 'onSectionChange' | 'scroll',
-    scrollValue: 70,
-    pagePath: '/',
-    animation: 'wave' | 'dance',
-    text: '',
-    time: '',
-    cta: []
-  }
-]
-
-CURRENT CONFIG:
-[
-  {
-    type: 'onLoad',
-    pagePath: '/',
+    id: 'first-land',
+    type: 'onFirstLand',
     animation: 'wave',
-    text: 'Welcome to Sulphur Labs',
-    time: 5000,
-    cta: []
+    hasClose: false,
+    text: 'So excited to have you here! 😄 ',
+    time: 2000,
+    onEnd: 'introduction',
+    cta: [],
   },
   {
-    type: 'onLoad',
-    pagePath: '/pricing.html',
-    animation: 'wave',
-    text: 'Offer available for you',
-    time: 5000,
-    cta: []
+    id: 'introduction',
+    hasClose: false,
+    text: 'I\'m Frexy, your coolest assistant 😎. Feel free to ask me anything! 💬',
+    time: 3000,
+    cta: [],
   },
   {
-    type: 'onSectionChange',
-    pagePath: '#section-3',
+    id: 'inactivity',
+    type: 'inActive',
+    inActiveTime: 20000,
+    hasClose: false,
+    text: 'Hey! You there? 👀👋',
     animation: 'wave',
-    text: 'Want to know more?',
-    time: 5000,
-    cta: []
+    time: 3000,
+    cta: [],
   },
   {
+    id: 'test-1',
     type: 'scroll',
     scrollValue: 70,
     pagePath: '/',
-    animation: 'wave',
-    text: 'Download this below',
-    time: 5000,
-    cta: []
-  }
-]
-*/
-
-
-const CONFIG = [
-  {
-    type: 'onLoad',
-    pagePath: '/threeJS-embed/',
     match: 'exact',
-    animation: 'wave',
-    text: 'Welcome to Sulphur Labs',
-    time: 2000,
-    cta: []
-  },
-  {
-    type: 'onLoad',
-    pagePath: '/pricing.html',
-    match: 'includes',
-    animation: 'swingdance',
-    text: 'Offer available for you',
-    hasClose: true,
+    animation: 'shrug',
+    hasClose: false,
+    time: 15000,
+    text: 'Did you know the chatbot market is projected to hit $102.26 billion?',
     cta: [{
-      text: 'Download',
-      onClick: () => window.open('file.docx')
+      text: 'Read More',
+      bg: '#1F8527',
+      color: 'white',
+      onClick: () => {
+        window.open('file.docx');
+      }
     }]
   },
   {
-    type: 'onSectionChange',
-    pagePath: 'milestone-4',
-    animation: 'golf',
-    text: 'Want to know more?',
-    time: 2000,
-    cta: []
-  },
-  {
+    id: 'test-2',
     type: 'scroll',
-    scrollValue: 70,
-    pagePath: '/pricing.html',
+    scrollValue: 50,
+    pagePath: '/customers',
     match: 'includes',
     animation: 'shrug',
+    hasClose: true,
+    time: 15000,
+    text: 'I boosted site engagement by 200% for CompanyX',
+    cta: [{
+      text: 'See How',
+      bg: '#1F8527',
+      color: 'white',
+      onClick: () => {
+        window.open('file.docx');
+      }
+    }]
+  },
+  {
+    id: 'test-3',
+    type: 'onLoad',
+    pagePath: '/pricing',
+    match: 'includes',
+    animation: 'shrug',
+    hasClose: true,
+    delay: 20000,
+    time: 15000,
+    text: 'Hey! I\'ve got a special discount 🎉 just for you! Wanna check it out?',
+    cta: [{
+      text: 'Yes',
+      bg: '#1F8527',
+      color: 'white',
+      nextInteraction: 'offer-1'
+    }, {
+      text: 'No',
+      bg: '#FF0000',
+      color: 'white',
+      alertText: 'No worries! 😎 Maybe next time. We\'ll save the good stuff for you!'
+    }]
+  },
+  {
+    id: 'test-4',
+    type: 'onLoad',
+    pagePath: '/booking',
+    match: 'includes',
+    animation: 'shrug',
+    hasClose: true,
+    time: 15000,
+    text: 'Awesome! 🎉 Need help scheduling a call? I can set it up for you! 📅',
+    cta: [{
+      text: 'Yes',
+      bg: '#1F8527',
+      color: 'white',
+      nextInteraction: 'openChatbot'
+    }, {
+      text: 'No',
+      bg: '#FF0000',
+      color: 'white',
+      alertText: 'No worries! 😎'
+    }],
+    onClickClose: {
+      alertText: 'Wait! You didn\'t book the call? 🤔'
+    }
+  },
+  {
+    id: 'offer-1',
+    hasClose: true,
     timerCountdown: 120,
     innerHTML: `<img src="https://cdn.prod.website-files.com/61813b089ddadb7ca3b7468d/6391c522fe77f1de7bad14a2_pop-up-example-6.jpg" style="width:160px;height:100px;border-radius:10px"/>`,
-    hasClose: true,
     cta: []
-  }
+  },
 ];
 
 
@@ -107,7 +132,6 @@ let scene,
   mixer,                              // THREE.js animations mixer
   idle,                               // Idle, the default state our character returns to
   clock = new THREE.Clock(),          // Used for anims, which run to a clock instead of frame rate 
-  currentlyAnimating = false,         // Used to check whether characters neck is being used in another anim
   raycaster = new THREE.Raycaster();  // Used to detect the click on our character
 
 init();
@@ -131,7 +155,7 @@ function init() {
       position: fixed;
       bottom: 36px;
       right: 36px;
-      --colorA: #b78eff;
+      --colorA: #BE0EFF;
       
       &::before,
       &::after {
@@ -154,7 +178,7 @@ function init() {
       }
       
       &::after {
-          --colorA: #ffec41;
+          --colorA: #6622FF;
           animation-delay: -1.5s;
       }
   }
@@ -254,7 +278,6 @@ function init() {
       fallbackLoader.remove();
       appendInput();
       triggerConfig();
-      // waveOnLoad();
     },
     undefined, // We don't need this function
     function(error) {
@@ -320,42 +343,32 @@ function resizeRendererToDisplaySize(renderer) {
     }
     return needResize;
 }
-     
-// window.addEventListener('click', () => playOnClick());
-// window.addEventListener('touchend', () => playOnClick());
 
-// function playOnClick() {
-//   console.log('~~~~ here', possibleAnims);
-//   let anim = Math.floor(Math.random() * possibleAnims.length) + 0;
-//   playModifierAnimation(idle, 0.25, possibleAnims[anim], 0.25);
-// }
+let isFirstLandTriggered = false;
+let currentlyAnimating = false;
+
 
 function triggerConfig() {
   CONFIG.map(config => {
     switch(config.type){
-      case 'onLoad':
-        const path = window.location.pathname;
-        if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
-          const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-          if(config.innerHTML){
-            showOverlay(config.innerHTML, config.time, config.cta, config.hasClose, config.timerCountdown, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
-          } else {
-            showTooltip(config.text, config.time, config.cta, config.hasClose, config.timerCountdown, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
-          }
+      case 'onFirstLand':
+        if(!isFirstLandTriggered){
+          showUIAnimation(config);
         }
         break;
-      case 'onSectionChange':
-        window.addEventListener('hashchange', function() {
-          const path = window.location.hash;
-          const input = document.getElementById('milestone')?.value;
-          console.log(path, input, config.pagePath);
-          if(path === `#${config.pagePath}`){
-            const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-            if(config.innerHTML){
-              showOverlay(config.innerHTML, config.time, config.cta,  config.hasClose, config.timerCountdown,() => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
-            } else {
-              showTooltip(config.text, config.time, config.cta, config.hasClose, config.timerCountdown, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
-            }
+      case 'inActive':
+        let timer;
+        timer = setTimeout(() => showUIAnimation(config), config.inActiveTime);
+        window.addEventListener('click', () => {
+          if(timer){
+            clearTimeout(timer);
+            timer = setTimeout(() => showUIAnimation(config), config.inActiveTime);
+          }
+        });
+        window.addEventListener('scroll', () => {
+          if(timer){
+            clearTimeout(timer);
+            timer = setTimeout(() => showUIAnimation(config), config.inActiveTime);
           }
         });
         break;
@@ -368,69 +381,359 @@ function triggerConfig() {
           const path = window.location.pathname;
         
           if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath)) && Number(scrollPercent)>Number(config.scrollValue)){
-            const idx = possibleAnims.findIndex(animation => animation.name === config.animation);
-            if(config.innerHTML){
-              showOverlay(config.innerHTML, config.time, config.cta,  config.hasClose, config.timerCountdown,() => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
-            } else {
-              showTooltip(config.text, config.time, config.cta, config.hasClose, config.timerCountdown, () => playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25));
-            }
+            showUIAnimation(config);
           }
         });
         break;
-      default:
+      case 'onLoad':
+        const path = window.location.pathname;
+        if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
+          if(config.delay){
+            setTimeout(() => showUIAnimation(config), config.delay);
+          } else{
+            showUIAnimation(config);
+          }
+        }
         break;
     }
   })
 }
 
-//CUSTOM
-// function waveOnLoad() {
-//   const path = window.location.pathname;
-//   const input = document.getElementById('landing')?.value;
-//   if(path.includes(input) && !currentlyAnimating){
-//     const idx = possibleAnims.findIndex(animation => animation.name === "wave");
-//     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-//     showTooltip('Welcome to Sulphur Labs', 5000);
-//   }
-//   const inputPage = document.getElementById('pricing')?.value;
-//   if(path.includes(inputPage) && !currentlyAnimating){
-//     console.log(possibleAnims);
-//     const idx = possibleAnims.findIndex(animation => animation.name === "swingdance");
-//     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-//     showTooltip('Offer unlocked for you', 5000);
-//   }
-// }
+function showUIAnimation(config) {
+  console.log(currentlyAnimating);
+  if(currentlyAnimating) return;
+  let animationIdx = -1;
+  if(config.animation){
+    animationIdx = possibleAnims.findIndex(animation => animation.name === config.animation);
+  }
+  const type = config.text ? 'tooltip' : 'overlay';
+  hideInput();
+  if(animationIdx>=0){
+    playModifierAnimation(idle, 0.25, possibleAnims[animationIdx], 0.25)
+  }
+  if(type === 'tooltip'){
+    showTooltip(config.text, config.time, config.cta, config.hasClose, config.onClickClose, config.timerCountdown, () => {
+      if(config.onEnd) showUIAnimation(CONFIG.filter(c => c.id === config.onEnd)[0])
+      else showInput();
+    });
+  } else {
+    showOverlay(config.innerHTML, config.time, config.cta, config.hasClose, config.onClickClose, config.timerCountdown, () => {
+      if(config.onEnd) showUIAnimation(CONFIG.filter(c => c.id === config.onEnd)[0])
+      else showInput();
+    });
+  }
+}
 
-// window.addEventListener('hashchange', function() {
-//   const path = window.location.hash;
-//   const input = document.getElementById('milestone')?.value;
-//   console.log(path, input, path === `#${input}`);
-//   if(path === `#${input}` && !currentlyAnimating){
-//     const idx = possibleAnims.findIndex(animation => animation.name === "golf");
-//     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-//     showTooltip('Checkout our offers!', 5000);
-//   }
-// });
+function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown, animationCB) {
+  currentlyAnimating = true;
+  const tooltipContainer = document.createElement('div');
+  tooltipContainer.style.position = 'fixed';
+  tooltipContainer.style.maxWidth = '280px';
 
-// let isPlayed = false;
+  const tooltip = document.createElement('div');
+  tooltip.id = 'tooltip';
+  tooltip.innerHTML = text;
+  tooltipContainer.appendChild(tooltip);
 
-// window.addEventListener('scroll', function() {
-//   const scrollTop = window.scrollY || window.pageYOffset;
-//   const docHeight = document.documentElement.scrollHeight;
-//   const winHeight = window.innerHeight;
-//   const scrollPercent = (scrollTop / (docHeight - winHeight)) * 100;
+  tooltip.style.position = 'relative';
+  tooltip.style.backgroundColor = 'rgba(255, 255, 255, 0.75)';
+  tooltip.style.color = 'rgba(0, 0, 0, 0.75)';
+  tooltip.style.padding = '10px 14px';
+  tooltip.style.borderRadius = '16px';
+  tooltip.style.fontSize = '16px';
+  tooltip.style.fontFamily = 'Arial Helvetica sans-serif';
+  tooltip.style.border = '2px solid black';
+  tooltip.style.pointerEvents = 'none';
+  tooltip.style.whiteSpace = 'nowrap';
+  tooltip.style.zIndex = '10'
+  tooltip.style.boxShadow = '0 0 4px black';
+  tooltip.style.textWrap = 'wrap';
+  // Arrow style for the tooltip using a pseudo element
+  tooltip.style.setProperty('--tooltip-arrow-size', '5px');
+  tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(0, 0, 0, 0.75)')
+  tooltip.style.margin = '8px 0'
+  const arrow = document.createElement('div');
+  arrow.style.position = 'absolute';
+  arrow.style.width = '0';
+  arrow.style.height = '0';
+  arrow.style.borderLeft = '8px solid transparent';
+  arrow.style.borderRight = '8px solid transparent';
+  arrow.style.borderTop = '8px solid rgba(0, 0, 0, 0.75)';
+  arrow.style.top = '40%';
+  arrow.style.right = '-12px';
+  arrow.style.transform = 'rotate(-90deg)';
+  tooltip.appendChild(arrow);
 
-//   const input = document.getElementById('scroll')?.value;
-//   if(Number(scrollPercent)>Number(input) && !isPlayed && !currentlyAnimating){
-//     isPlayed = true;
-//     const idx = possibleAnims.findIndex(animation => animation.name === "shrug");
-//     playModifierAnimation(idle, 0.25, possibleAnims[idx], 0.25);
-//     showTooltip('Finding something?', 5000, [{
-//       text: 'Download',
-//       onClick: () => window.open('file.docx')
-//     }]);
-//   }
-// });
+  function closeUI(){
+    tooltipContainer.remove();
+    currentlyAnimating = false;
+    console.log('close', currentlyAnimating);
+    animationCB();
+  }
+
+  if(hasClose){
+    const closeBtn = document.createElement('button');
+    closeBtn.style.background = 'white';
+    closeBtn.style.padding = '2px';
+    closeBtn.style.border = '1px solid black';
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '2px';
+    closeBtn.style.right = '-4px';
+    closeBtn.style.width = '16px';
+    closeBtn.style.height = '16px';
+    closeBtn.style.fontSize = '10px';
+    closeBtn.style.borderRadius = '50%';
+    closeBtn.style.zIndex = '99';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.innerHTML = 'X';
+    closeBtn.addEventListener('click', () => {
+      if(onClickClose){
+        if(onClickClose.alertText){
+          closeUI();
+          showUIAnimation({
+            hasClose: false,
+            text: onClickClose.alertText,
+            time: 2000,
+            cta: [],
+          })
+          return;
+        }
+      }
+      closeUI();
+    });
+    tooltipContainer.appendChild(closeBtn);
+  }
+
+  if(timerCountdown){
+    const timer = document.createElement('div');
+    timer.style.textAlign = 'center';
+    timer.style.padding = '2px 6px';
+    timer.style.color = '#ff0000';  
+    timer.style.fontSize = '12px';
+    timer.style.fontWeight = 'bold';
+    timer.style.position = 'absolute';
+    timer.style.top = '-8px';
+    timer.style.left = '-10px';
+    timer.style.borderRadius = '8px';
+    timer.style.zIndex = '99';
+    timer.style.background = 'white';
+    // timer.style.border = '1px solid black';
+
+    function formatTime(seconds) {
+      let minutes = Math.floor(seconds / 60);  // Get the minutes
+      let secs = seconds % 60;  // Get the remaining seconds
+      return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  // Format as MM:SS
+    }
+  
+    function updateTimer() {
+        if (timerCountdown > 0) {
+            timer.innerText = `${formatTime(timerCountdown)}`;  // Display in MM:SS format
+            timerCountdown--;
+        } else {
+          tooltipContainer.remove();
+          currentlyAnimating = false;
+          showInput();
+        }
+    }
+  
+    // Update the timer every second
+    setInterval(updateTimer, 1000);
+    tooltipContainer.appendChild(timer);
+  } 
+
+  if(ctaList){
+    const ctaContainer = document.createElement('div');
+    ctaList.map(ctaItem => {
+      const btn = document.createElement('button');
+      btn.innerHTML = ctaItem.text;
+      btn.style.borderRadius = '12px';
+      btn.style.border = '0';
+      btn.style.fontSize = '14px';
+      btn.style.background = ctaItem.bg;
+      btn.style.color = ctaItem.color;
+      btn.style.padding = '6px 10px';
+      btn.style.marginRight = '6px';
+      btn.style.cursor = 'pointer';
+      btn.addEventListener('click', () => {
+        if(ctaItem.onClick){
+          ctaItem.onClick();
+          closeUI();
+        } else if(ctaItem.alertText){
+          closeUI();
+          showUIAnimation({
+            hasClose: false,
+            text: ctaItem.alertText,
+            time: 2000,
+            cta: [],
+          })
+        } else if(ctaItem.nextInteraction){
+          closeUI();
+          if(ctaItem.nextInteraction === 'openChatbot'){
+            showChatWindow();
+          }
+          else showUIAnimation(CONFIG.filter(c => c.id === ctaItem.nextInteraction)[0]);
+        }
+      });
+      ctaContainer.appendChild(btn);
+    })
+    tooltipContainer.appendChild(ctaContainer);
+  }
+
+  document.body.appendChild(tooltipContainer);
+  const canvas = document.getElementById('threejs-canvas');
+  const canvasBounds = canvas.getBoundingClientRect();
+  tooltipContainer.style.right  = isMobile ? '90px' : '120px';
+  tooltipContainer.style.top = (canvasBounds.top + 88) + 'px';
+  tooltipContainer.style.display = 'block';
+
+  if(time){
+    setTimeout(() => {
+      closeUI();
+    }, time);
+  }
+}
+
+function showOverlay(innerHTML, time, ctaList, hasClose,onClickClose, timerCountdown, animationCB) {
+  currentlyAnimating = true;
+  const tooltipContainer = document.createElement('div');
+  tooltipContainer.style.position = 'fixed';
+  tooltipContainer.innerHTML = innerHTML;
+
+  function closeUI(){
+    tooltipContainer.remove();
+    currentlyAnimating = false;
+    animationCB();
+  }
+
+  if(hasClose){
+    const closeBtn = document.createElement('button');
+    closeBtn.style.background = 'white';
+    closeBtn.style.padding = '2px';
+    closeBtn.style.border = '1px solid black';
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '-4px';
+    closeBtn.style.right = '-4px';
+    closeBtn.style.width = '16px';
+    closeBtn.style.height = '16px';
+    closeBtn.style.fontSize = '10px';
+    closeBtn.style.borderRadius = '50%';
+    closeBtn.style.zIndex = '99';
+    closeBtn.innerHTML = 'X';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.addEventListener('click', () => {
+      if(onClickClose){
+        if(onClickClose.alertText){
+          closeUI();
+          showUIAnimation({
+            hasClose: false,
+            text: onClickClose.alertText,
+            time: 2000,
+            cta: [],
+          })
+          return;
+        }
+      }
+      closeUI();
+    });
+    tooltipContainer.appendChild(closeBtn);
+  }
+
+  if(timerCountdown){
+    const timer = document.createElement('div');
+    timer.style.textAlign = 'center';
+    timer.style.padding = '2px 6px';
+    timer.style.color = '#ff0000';  
+    timer.style.fontSize = '12px';
+    timer.style.fontWeight = 'bold';
+    timer.style.position = 'absolute';
+    timer.style.top = '-8px';
+    timer.style.left = '-10px';
+    timer.style.borderRadius = '8px';
+    timer.style.zIndex = '99';
+    timer.style.background = 'white';
+
+    function formatTime(seconds) {
+      let minutes = Math.floor(seconds / 60);  // Get the minutes
+      let secs = seconds % 60;  // Get the remaining seconds
+      return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  // Format as MM:SS
+    }
+
+    function updateTimer() {
+        if (timerCountdown > 0) {
+            timer.innerText = `${formatTime(timerCountdown)}`;  // Display in MM:SS format
+            timerCountdown--;
+        } else {
+          tooltipContainer.remove();
+          currentlyAnimating = false;
+          showInput();
+        }
+    }
+
+    // Update the timer every second
+    setInterval(updateTimer, 1000);
+    tooltipContainer.appendChild(timer);
+  }  
+
+  if(ctaList){
+    const ctaContainer = document.createElement('div');
+    ctaList.map(ctaItem => {
+      const btn = document.createElement('button');
+      btn.innerHTML = ctaItem.text;
+      btn.style.borderRadius = '4px';
+      btn.style.border = '1px solid black';
+      btn.style.background = '#D9FBE1';
+      btn.style.padding = '4px 8px';
+      btn.style.cursor = 'pointer';
+      btn.addEventListener('click', () => {
+        if(ctaItem.onClick){
+          ctaItem.onClick();
+          closeUI();
+        } else if(ctaItem.alertText){
+          closeUI();
+          showUIAnimation({
+            hasClose: false,
+            text: ctaItem.alertText,
+            time: 2000,
+            cta: [],
+          })
+        } else if(ctaItem.nextInteraction){
+          closeUI();
+          if(ctaItem.nextInteraction === 'openChatbot'){
+            showChatWindow();
+          }
+          else showUIAnimation(CONFIG.filter(c => c.id === ctaItem.nextInteraction)[0]);
+        }
+      });
+      ctaContainer.appendChild(btn);
+    })
+    tooltipContainer.appendChild(ctaContainer);
+  }
+
+  document.body.appendChild(tooltipContainer);
+  const canvas = document.getElementById('threejs-canvas');
+  const canvasBounds = canvas.getBoundingClientRect();
+  tooltipContainer.style.right  = isMobile ? '90px' : '120px';
+  tooltipContainer.style.top = (canvasBounds.top + 88) + 'px';
+  tooltipContainer.style.display = 'block';
+
+  if(time){
+    setTimeout(() => {
+      closeUI();
+    }, time);
+  }
+}
+
+function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
+  const to = finalAnim.clip;
+  to.setLoop(THREE.LoopOnce);
+  to.reset();
+  to.play();
+  from.crossFadeTo(to, fSpeed, true);
+  setTimeout(function() {
+    from.enabled = true;
+    to.crossFadeTo(from, tSpeed, true);
+  }, to._clip.duration * 1000 -((tSpeed + fSpeed) * 1000));
+}
 
 function appendInput() {
   // Create an input element (rounded input box)
@@ -564,245 +867,6 @@ function appendChatWindow() {
 function showChatWindow(){
   const chat = document.getElementById('chatWindow');
   chat.style.display = 'block';
-}
-        
-function showTooltip(message, time, ctaList, hasClose, timerCountdown, animationCB) {
-    if(currentlyAnimating) return;
-    animationCB();
-    hideInput();
-    const tooltipContainer = document.createElement('div');
-    tooltipContainer.style.position = 'fixed';
-
-    const tooltip = document.createElement('div');
-    tooltip.id = 'tooltip';
-    tooltip.innerHTML = message;
-    tooltipContainer.appendChild(tooltip);
-
-    tooltip.style.position = 'relative';
-    tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-    tooltip.style.color = '#fff';
-    tooltip.style.padding = '8px';
-    tooltip.style.borderRadius = '5px';
-    tooltip.style.fontSize = '14px';
-    // tooltip.style.display = 'none';s
-    tooltip.style.pointerEvents = 'none';
-    tooltip.style.whiteSpace = 'nowrap';
-    tooltip.style.zIndex = '10'
-    // Arrow style for the tooltip using a pseudo element
-    tooltip.style.setProperty('--tooltip-arrow-size', '5px');
-    tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(0, 0, 0, 0.75)')
-    tooltip.style.margin = '4px 0'
-    const arrow = document.createElement('div');
-    arrow.style.position = 'absolute';
-    arrow.style.width = '0';
-    arrow.style.height = '0';
-    arrow.style.borderLeft = '5px solid transparent';
-    arrow.style.borderRight = '5px solid transparent';
-    arrow.style.borderTop = '6px solid rgba(0, 0, 0, 0.75)';
-    arrow.style.top = '50%';
-    arrow.style.right = '-7px';
-    arrow.style.transform = 'rotate(-90deg)';
-    tooltip.appendChild(arrow);
-
-    if(hasClose){
-      const closeBtn = document.createElement('button');
-      closeBtn.style.background = 'white';
-      closeBtn.style.padding = '2px';
-      closeBtn.style.border = '1px solid black';
-      closeBtn.style.position = 'absolute';
-      closeBtn.style.top = '-4px';
-      closeBtn.style.right = '-4px';
-      closeBtn.style.width = '16px';
-      closeBtn.style.height = '16px';
-      closeBtn.style.fontSize = '10px';
-      closeBtn.style.borderRadius = '50%';
-      closeBtn.style.zIndex = '99';
-      closeBtn.innerHTML = 'X';
-      closeBtn.addEventListener('click', () => {
-        tooltipContainer.remove();
-        currentlyAnimating = false;
-        showInput();
-      })
-      tooltipContainer.appendChild(closeBtn);
-    }
-
-    if(timerCountdown){
-      const timer = document.createElement('div');
-      timer.style.textAlign = 'center';
-      timer.style.padding = '2px 6px';
-      timer.style.color = '#ff0000';  
-      timer.style.fontSize = '12px';
-      timer.style.fontWeight = 'bold';
-      timer.style.position = 'absolute';
-      timer.style.top = '-8px';
-      timer.style.left = '-10px';
-      timer.style.borderRadius = '8px';
-      timer.style.zIndex = '99';
-      timer.style.background = 'white';
-      // timer.style.border = '1px solid black';
-  
-      function formatTime(seconds) {
-        let minutes = Math.floor(seconds / 60);  // Get the minutes
-        let secs = seconds % 60;  // Get the remaining seconds
-        return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  // Format as MM:SS
-      }
-    
-      function updateTimer() {
-          if (timerCountdown > 0) {
-              timer.innerText = `${formatTime(timerCountdown)}`;  // Display in MM:SS format
-              timerCountdown--;
-          } else {
-            tooltipContainer.remove();
-            currentlyAnimating = false;
-            showInput();
-          }
-      }
-    
-      // Update the timer every second
-      setInterval(updateTimer, 1000);
-      tooltipContainer.appendChild(timer);
-    } 
-
-    if(ctaList){
-      const ctaContainer = document.createElement('div');
-      ctaList.map(ctaItem => {
-        const btn = document.createElement('button');
-        btn.innerHTML = ctaItem.text;
-        btn.style.borderRadius = '4px';
-        btn.style.border = '1px solid black';
-        btn.style.background = '#D9FBE1';
-        btn.style.padding = '4px 8px';
-        btn.addEventListener('click', ctaItem.onClick);
-        ctaContainer.appendChild(btn);
-      })
-      tooltipContainer.appendChild(ctaContainer);
-    }
-
-    document.body.appendChild(tooltipContainer);
-    const canvas = document.getElementById('threejs-canvas');
-    const canvasBounds = canvas.getBoundingClientRect();
-    tooltipContainer.style.left = (canvasBounds.left - 48) + 'px';
-    tooltipContainer.style.top = (canvasBounds.top + 120) + 'px';
-    tooltipContainer.style.display = 'block';
-
-    if(time){
-      setTimeout(() => {
-          tooltipContainer.remove();
-          currentlyAnimating = false;
-          showInput();
-      }, time);
-    }
-}
-
-function showOverlay(innerHTML, time, ctaList, hasClose, timerCountdown, animationCB) {
-  if(currentlyAnimating) return;
-  animationCB();
-  hideInput();
-  const tooltipContainer = document.createElement('div');
-  tooltipContainer.style.position = 'fixed';
-  tooltipContainer.innerHTML = innerHTML;
-
-  if(hasClose){
-    const closeBtn = document.createElement('button');
-    closeBtn.style.background = 'white';
-    closeBtn.style.padding = '2px';
-    closeBtn.style.border = '1px solid black';
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '-4px';
-    closeBtn.style.right = '-4px';
-    closeBtn.style.width = '16px';
-    closeBtn.style.height = '16px';
-    closeBtn.style.fontSize = '10px';
-    closeBtn.style.borderRadius = '50%';
-    closeBtn.style.zIndex = '99';
-    closeBtn.innerHTML = 'X';
-    closeBtn.addEventListener('click', () => {
-      tooltipContainer.remove();
-      currentlyAnimating = false;
-      showInput();
-    })
-    tooltipContainer.appendChild(closeBtn);
-  }
-
-  if(timerCountdown){
-    const timer = document.createElement('div');
-    timer.style.textAlign = 'center';
-    timer.style.padding = '2px 6px';
-    timer.style.color = '#ff0000';  
-    timer.style.fontSize = '12px';
-    timer.style.fontWeight = 'bold';
-    timer.style.position = 'absolute';
-    timer.style.top = '-8px';
-    timer.style.left = '-10px';
-    timer.style.borderRadius = '8px';
-    timer.style.zIndex = '99';
-    timer.style.background = 'white';
-    // timer.style.border = '1px solid black';
-
-    function formatTime(seconds) {
-      let minutes = Math.floor(seconds / 60);  // Get the minutes
-      let secs = seconds % 60;  // Get the remaining seconds
-      return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  // Format as MM:SS
-    }
-  
-    function updateTimer() {
-        if (timerCountdown > 0) {
-            timer.innerText = `${formatTime(timerCountdown)}`;  // Display in MM:SS format
-            timerCountdown--;
-        } else {
-          tooltipContainer.remove();
-          currentlyAnimating = false;
-          showInput();
-        }
-    }
-  
-    // Update the timer every second
-    setInterval(updateTimer, 1000);
-    tooltipContainer.appendChild(timer);
-  }  
-
-  if(ctaList){
-    const ctaContainer = document.createElement('div');
-    ctaList.map(ctaItem => {
-      const btn = document.createElement('button');
-      btn.innerHTML = ctaItem.text;
-      btn.style.borderRadius = '4px';
-      btn.style.border = '1px solid black';
-      btn.style.background = '#D9FBE1';
-      btn.style.padding = '4px 8px';
-      btn.addEventListener('click', ctaItem.onClick);
-      ctaContainer.appendChild(btn);
-    })
-    tooltipContainer.appendChild(ctaContainer);
-  }
-
-  document.body.appendChild(tooltipContainer);
-  const canvas = document.getElementById('threejs-canvas');
-  const canvasBounds = canvas.getBoundingClientRect();
-  tooltipContainer.style.left = (canvasBounds.left - 48) + 'px';
-  tooltipContainer.style.top = (canvasBounds.top + 120) + 'px';
-  tooltipContainer.style.display = 'block';
-
-  if(time){
-    setTimeout(() => {
-      tooltipContainer.remove();
-      currentlyAnimating = false;
-      showInput();
-    }, time);
-  }
-}
-
-function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
-  currentlyAnimating = true;
-  const to = finalAnim.clip;
-  to.setLoop(THREE.LoopOnce);
-  to.reset();
-  to.play();
-  from.crossFadeTo(to, fSpeed, true);
-  setTimeout(function() {
-    from.enabled = true;
-    to.crossFadeTo(from, tSpeed, true);
-  }, to._clip.duration * 1000 -((tSpeed + fSpeed) * 1000));
 }
  
 if(!isMobile){
