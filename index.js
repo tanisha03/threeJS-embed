@@ -66,7 +66,7 @@ const CONFIG = [
   },
   {
     id: 'test-3',
-    type: 'onLoad',
+    type: 'popstate',
     pagePath: '/pricing',
     match: 'includes',
     animation: 'shrug',
@@ -88,7 +88,7 @@ const CONFIG = [
   },
   {
     id: 'test-4',
-    type: 'onLoad',
+    type: 'popstate',
     pagePath: '/booking',
     match: 'includes',
     animation: 'shrug',
@@ -385,15 +385,17 @@ function triggerConfig() {
           }
         });
         break;
-      case 'onLoad':
-        const path = window.location.pathname;
-        if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
-          if(config.delay){
-            setTimeout(() => showUIAnimation(config), config.delay);
-          } else{
-            showUIAnimation(config);
+      case 'popstate':
+        window.addEventListener('popstate', () => {
+          const path = window.location.pathname;
+          if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
+            if(config.delay){
+              setTimeout(() => showUIAnimation(config), config.delay);
+            } else{
+              showUIAnimation(config);
+            }
           }
-        }
+        })
         break;
     }
   })
@@ -436,13 +438,15 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
   tooltipContainer.appendChild(tooltip);
 
   tooltip.style.position = 'relative';
-  tooltip.style.backgroundColor = 'rgba(255, 255, 255, 0.75)';
-  tooltip.style.color = 'rgba(0, 0, 0, 0.75)';
+  // tooltip.style.backgroundColor = 'rgba(255, 255, 255, 0.75)';
+  // tooltip.style.color = 'rgba(0, 0, 0, 0.75)';
+  tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+  tooltip.style.color = 'rgba(255, 255, 255, 0.75)';
   tooltip.style.padding = '10px 14px';
   tooltip.style.borderRadius = '16px';
   tooltip.style.fontSize = '16px';
   tooltip.style.fontFamily = 'Arial Helvetica sans-serif';
-  tooltip.style.border = '2px solid black';
+  tooltip.style.border = '2px solid rgba(255, 255, 255, 0.75)';
   tooltip.style.pointerEvents = 'none';
   tooltip.style.whiteSpace = 'nowrap';
   tooltip.style.zIndex = '10'
@@ -450,7 +454,7 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
   tooltip.style.textWrap = 'wrap';
   // Arrow style for the tooltip using a pseudo element
   tooltip.style.setProperty('--tooltip-arrow-size', '5px');
-  tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(0, 0, 0, 0.75)')
+  tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(255, 255, 255, 0.75)')
   tooltip.style.margin = '8px 0'
   const arrow = document.createElement('div');
   arrow.style.position = 'absolute';
@@ -458,7 +462,7 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
   arrow.style.height = '0';
   arrow.style.borderLeft = '8px solid transparent';
   arrow.style.borderRight = '8px solid transparent';
-  arrow.style.borderTop = '8px solid rgba(0, 0, 0, 0.75)';
+  arrow.style.borderTop = '8px solid rgba(255, 255, 255, 0.75)';
   arrow.style.top = '40%';
   arrow.style.right = '-12px';
   arrow.style.transform = 'rotate(-90deg)';
@@ -743,12 +747,11 @@ function appendInput() {
 
   // Styling the input to make it look like a rounded box
   input.style.position = 'fixed';
-  input.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+  input.style.border = '1px solid black';
   input.style.color = '#000';
   input.style.padding = '8px 16px';
   input.style.borderRadius = '20px';  // Rounded corners
   input.style.fontSize = '14px';
-  input.style.border = 'none';        // Remove default input border
   input.style.outline = 'none';       // Remove input focus outline
   input.style.display = 'none';
   input.style.whiteSpace = 'nowrap';
@@ -792,6 +795,7 @@ function appendChatWindow() {
   // Styling the chat window to look like a small chat box
   chatWindow.style.position = 'fixed';
   chatWindow.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+  chatWindow.style.border = '1px solid white';
   chatWindow.style.color = '#fff';
   chatWindow.style.padding = '16px';
   chatWindow.style.borderRadius = '15px';  // Rounded corners
