@@ -1,25 +1,25 @@
 const CONFIG = [
-  // {
-  //   id: 'first-land',
-  //   type: 'onFirstLand',
-  //   animation: 'wave',
-  //   hasClose: false,
-  //   text: 'So excited to have you here! 😄 ',
-  //   time: 2000,
-  //   onEnd: 'introduction',
-  //   cta: [],
-  // },
-  // {
-  //   id: 'introduction',
-  //   hasClose: false,
-  //   text: 'I\'m Frexy, your coolest assistant 😎. Feel free to ask me anything! 💬',
-  //   time: 3000,
-  //   cta: [],
-  // },
+  {
+    id: 'first-land',
+    type: 'onFirstLand',
+    animation: 'wave',
+    hasClose: false,
+    text: 'So excited to have you here! 😄 ',
+    time: 2000,
+    onEnd: 'introduction',
+    cta: [],
+  },
+  {
+    id: 'introduction',
+    hasClose: false,
+    text: 'I\'m Frexy, your coolest assistant 😎. Feel free to ask me anything! 💬',
+    time: 3000,
+    cta: [],
+  },
   {
     id: 'inactivity',
     type: 'inActive',
-    inActiveTime: 5000,
+    inActiveTime: 25000,
     hasClose: false,
     text: 'Hey! You there? 👀👋',
     animation: 'wave',
@@ -407,9 +407,7 @@ function triggerConfig() {
         break;
       case 'popstate':
         window.addEventListener('pathChange', () => {
-          // console.log('~~~~ ', path, config.pagePath);
           const path = window.location.pathname;
-          console.log('~~~~ ', path, config.pagePath, config.delay, config.match);
           if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
             if(config.delay){
               setTimeout(() => showUIAnimation(config), config.delay);
