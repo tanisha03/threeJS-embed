@@ -347,6 +347,26 @@ function resizeRendererToDisplaySize(renderer) {
 let isFirstLandTriggered = false;
 let currentlyAnimating = false;
 
+//path change event
+
+function dispatchPathChangeEvent() {
+  const pathChangeEvent = new Event('pathChange');
+  window.dispatchEvent(pathChangeEvent);
+}
+
+let previousPathname = window.location.pathname;
+
+const observer = new MutationObserver(() => {
+  if (window.location.pathname !== previousPathname) {
+    previousPathname = window.location.pathname;
+    dispatchPathChangeEvent();
+    console.log('Pathname changed:', window.location.pathname);
+  }
+});
+
+// Observe the document body for changes
+observer.observe(document.body, { childList: true, subtree: true });
+
 
 function triggerConfig() {
   CONFIG.map(config => {
@@ -386,7 +406,7 @@ function triggerConfig() {
         });
         break;
       case 'popstate':
-        window.addEventListener('popstate', () => {
+        window.addEventListener('pathChange', () => {
           const path = window.location.pathname;
           if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
             if(config.delay){
@@ -402,7 +422,6 @@ function triggerConfig() {
 }
 
 function showUIAnimation(config) {
-  console.log(currentlyAnimating);
   if(currentlyAnimating) return;
   let animationIdx = -1;
   if(config.animation){
@@ -445,7 +464,6 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
   tooltip.style.padding = '10px 14px';
   tooltip.style.borderRadius = '16px';
   tooltip.style.fontSize = '16px';
-  tooltip.style.fontFamily = 'Arial Helvetica sans-serif';
   tooltip.style.border = '2px solid rgba(255, 255, 255, 0.75)';
   tooltip.style.pointerEvents = 'none';
   tooltip.style.whiteSpace = 'nowrap';
@@ -471,7 +489,6 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
   function closeUI(){
     tooltipContainer.remove();
     currentlyAnimating = false;
-    console.log('close', currentlyAnimating);
     animationCB();
   }
 
