@@ -1,25 +1,25 @@
 const CONFIG = [
-  {
-    id: 'first-land',
-    type: 'onFirstLand',
-    animation: 'wave',
-    hasClose: false,
-    text: 'So excited to have you here! 😄 ',
-    time: 2000,
-    onEnd: 'introduction',
-    cta: [],
-  },
-  {
-    id: 'introduction',
-    hasClose: false,
-    text: 'I\'m Frexy, your coolest assistant 😎. Feel free to ask me anything! 💬',
-    time: 3000,
-    cta: [],
-  },
+  // {
+  //   id: 'first-land',
+  //   type: 'onFirstLand',
+  //   animation: 'wave',
+  //   hasClose: false,
+  //   text: 'So excited to have you here! 😄 ',
+  //   time: 2000,
+  //   onEnd: 'introduction',
+  //   cta: [],
+  // },
+  // {
+  //   id: 'introduction',
+  //   hasClose: false,
+  //   text: 'I\'m Frexy, your coolest assistant 😎. Feel free to ask me anything! 💬',
+  //   time: 3000,
+  //   cta: [],
+  // },
   {
     id: 'inactivity',
     type: 'inActive',
-    inActiveTime: 20000,
+    inActiveTime: 5000,
     hasClose: false,
     text: 'Hey! You there? 👀👋',
     animation: 'wave',
@@ -71,7 +71,7 @@ const CONFIG = [
     match: 'includes',
     animation: 'shrug',
     hasClose: true,
-    delay: 20000,
+    delay: 10000,
     time: 15000,
     text: 'Hey! I\'ve got a special discount 🎉 just for you! Wanna check it out?',
     cta: [{
@@ -89,7 +89,7 @@ const CONFIG = [
   {
     id: 'test-4',
     type: 'popstate',
-    pagePath: '/booking',
+    pagePath: '/demo',
     match: 'includes',
     animation: 'shrug',
     hasClose: true,
@@ -407,7 +407,9 @@ function triggerConfig() {
         break;
       case 'popstate':
         window.addEventListener('pathChange', () => {
+          // console.log('~~~~ ', path, config.pagePath);
           const path = window.location.pathname;
+          console.log('~~~~ ', path, config.pagePath, config.delay, config.match);
           if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
             if(config.delay){
               setTimeout(() => showUIAnimation(config), config.delay);
