@@ -502,10 +502,6 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
     animationCB();
   }
 
-  window.addEventListener('pathChange', () => {
-    closeUI();
-  });
-
   if(hasClose){
     const closeBtn = document.createElement('button');
     closeBtn.style.background = 'white';
@@ -637,10 +633,6 @@ function showOverlay(innerHTML, time, ctaList, hasClose,onClickClose, timerCount
     currentlyAnimating = false;
     animationCB();
   }
-
-  window.addEventListener('pathChange', () => {
-    closeUI();
-  });
 
   if(hasClose){
     const closeBtn = document.createElement('button');
