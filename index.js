@@ -369,10 +369,6 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 const scrollState = {};
 
-window.addEventListener('pathChange', () => {
-  closeUI();
-});
-
 function triggerConfig() {
   CONFIG.map(config => {
     switch(config.type){
@@ -436,6 +432,7 @@ function triggerConfig() {
 
 function showUIAnimation(config) {
   if(currentlyAnimating) return;
+  resetHead();
   let animationIdx = -1;
   if(config.animation){
     animationIdx = possibleAnims.findIndex(animation => animation.name === config.animation);
@@ -504,6 +501,10 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
     currentlyAnimating = false;
     animationCB();
   }
+
+  window.addEventListener('pathChange', () => {
+    closeUI();
+  });
 
   if(hasClose){
     const closeBtn = document.createElement('button');
@@ -638,6 +639,10 @@ function showOverlay(innerHTML, time, ctaList, hasClose,onClickClose, timerCount
     currentlyAnimating = false;
     animationCB();
   }
+
+  window.addEventListener('pathChange', () => {
+    closeUI();
+  });
 
   if(hasClose){
     const closeBtn = document.createElement('button');
@@ -905,6 +910,7 @@ function showChatWindow(){
  
 if(!isMobile){
   document.addEventListener('mousemove', function(e) {
+    if(currentlyAnimating) return;
     var mousecoords = getMousePos(e);
     if(neck && waist && !currentlyAnimating) {
       moveJoint(mousecoords, neck, 50);
@@ -915,6 +921,16 @@ if(!isMobile){
 
 function getMousePos(e) {
     return { x: e.clientX, y: e.clientY};
+}
+
+function resetHead() {
+  let w = { x: window.innerWidth, y: window.innerHeight };
+
+  const xRef = (w.x - 160);
+  const yRef = (w.y - 190);
+
+  moveJoint({x: xRef, y: yRef}, neck, 50);
+  moveJoint({x: xRef, y: yRef}, waist, 30);
 }
 
 function moveJoint(mouse, joint, degreeLimit) {
