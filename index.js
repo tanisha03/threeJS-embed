@@ -33,7 +33,7 @@ const CONFIG = [
     pagePath: '/',
     match: 'exact',
     animation: 'shrug',
-    hasClose: false,
+    hasClose: true,
     time: 15000,
     text: 'Did you know the chatbot market is projected to hit $102.26 billion?',
     cta: [{
@@ -367,6 +367,7 @@ const observer = new MutationObserver(() => {
 // Observe the document body for changes
 observer.observe(document.body, { childList: true, subtree: true });
 
+const scrollState = {};
 
 function triggerConfig() {
   CONFIG.map(config => {
@@ -391,6 +392,12 @@ function triggerConfig() {
             timer = setTimeout(() => showUIAnimation(config), config.inActiveTime);
           }
         });
+        document.addEventListener('mousemove', () => {
+          if(timer){
+            clearTimeout(timer);
+            timer = setTimeout(() => showUIAnimation(config), config.inActiveTime);
+          }
+        });
         break;
       case 'scroll':
         window.addEventListener('scroll', function() {
@@ -401,12 +408,15 @@ function triggerConfig() {
           const path = window.location.pathname;
         
           if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath)) && Number(scrollPercent)>Number(config.scrollValue)){
+            if(scrollState[config.id]) return;
+            scrollState[config.id] = true;
             showUIAnimation(config);
           }
         });
         break;
       case 'popstate':
         window.addEventListener('pathChange', () => {
+          closeUI();
           const path = window.location.pathname;
           if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
             if(config.delay){
