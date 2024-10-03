@@ -905,8 +905,13 @@ function showChatWindow(){
 }
  
 if(!isMobile){
+  let timer = setTimeout(() => resetHead());
   document.addEventListener('mousemove', function(e) {
     if(currentlyAnimating) return;
+    if(timer){
+      clearTimeout(timer);
+      timer = setTimeout(() => resetHead(), 4000);
+    }
     var mousecoords = getMousePos(e);
     if(neck && waist && !currentlyAnimating) {
       moveJoint(mousecoords, neck, 50);
