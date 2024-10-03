@@ -369,6 +369,10 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 const scrollState = {};
 
+window.addEventListener('pathChange', () => {
+  closeUI();
+});
+
 function triggerConfig() {
   CONFIG.map(config => {
     switch(config.type){
@@ -416,7 +420,6 @@ function triggerConfig() {
         break;
       case 'popstate':
         window.addEventListener('pathChange', () => {
-          closeUI();
           const path = window.location.pathname;
           if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
             if(config.delay){
