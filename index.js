@@ -615,10 +615,8 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
   }
 
   document.body.appendChild(tooltipContainer);
-  const canvas = document.getElementById('threejs-canvas');
-  const canvasBounds = canvas.getBoundingClientRect();
   tooltipContainer.style.right  = isMobile ? '90px' : '120px';
-  tooltipContainer.style.top = (canvasBounds.top + 88) + 'px';
+  tooltipContainer.style.bottom = isMobile ? '64px' : '80px';
   tooltipContainer.style.display = 'block';
 
   if(time){
@@ -793,10 +791,8 @@ function appendInput() {
   input.style.zIndex = '10';
 
   // Positioning of the input box
-  const canvas = document.getElementById('threejs-canvas');
-  const canvasBounds = canvas.getBoundingClientRect();
-  input.style.left = (canvasBounds.left - 60) + 'px';
-  input.style.top = (canvasBounds.top + 160) + 'px';
+  input.style.bottom = isMobile ? '24px' : '40px';
+  input.style.right = isMobile ? '60px' : '80px';
 
   // Add the input element to the body
   document.body.appendChild(input);
