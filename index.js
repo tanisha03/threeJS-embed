@@ -359,8 +359,11 @@ let previousPathname = window.location.pathname;
 const observer = new MutationObserver(() => {
   if (window.location.pathname !== previousPathname) {
     previousPathname = window.location.pathname;
+    const tooltipContainer = document.getElementById('tooltipContainer');
+    tooltipContainer.remove();
+    currentlyAnimating = false;
+    showInput();
     dispatchPathChangeEvent();
-    console.log('Pathname changed:', window.location.pathname);
   }
 });
 
@@ -458,6 +461,7 @@ function showUIAnimation(config) {
 function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown, animationCB) {
   currentlyAnimating = true;
   const tooltipContainer = document.createElement('div');
+  tooltipContainer.id = 'tooltipContainer';
   tooltipContainer.style.position = 'fixed';
   tooltipContainer.style.maxWidth = '280px';
 
@@ -476,10 +480,9 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
   tooltip.style.fontSize = '16px';
   tooltip.style.border = '2px solid rgba(255, 255, 255, 0.75)';
   tooltip.style.pointerEvents = 'none';
-  tooltip.style.whiteSpace = 'nowrap';
+  tooltip.style.whiteSpace = 'wrap';
   tooltip.style.zIndex = '10'
   tooltip.style.boxShadow = '0 0 4px black';
-  tooltip.style.textWrap = 'wrap';
   // Arrow style for the tooltip using a pseudo element
   tooltip.style.setProperty('--tooltip-arrow-size', '5px');
   tooltip.style.setProperty('--tooltip-arrow-color', 'rgba(255, 255, 255, 0.75)')
@@ -779,7 +782,7 @@ function appendInput() {
   input.style.fontSize = '14px';
   input.style.outline = 'none';       // Remove input focus outline
   input.style.display = 'none';
-  input.style.whiteSpace = 'nowrap';
+  input.style.whiteSpace = 'wrap';
   input.style.zIndex = '10';
 
   // Positioning of the input box
