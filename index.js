@@ -360,7 +360,9 @@ const observer = new MutationObserver(() => {
   if (window.location.pathname !== previousPathname) {
     previousPathname = window.location.pathname;
     const tooltipContainer = document.getElementById('tooltipContainer');
-    tooltipContainer.remove();
+    if(tooltipContainer){
+      tooltipContainer.remove();
+    }
     currentlyAnimating = false;
     showInput();
     dispatchPathChangeEvent();
