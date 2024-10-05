@@ -469,7 +469,12 @@ function showTooltip(text, time, ctaList, hasClose, onClickClose, timerCountdown
 
   const tooltip = document.createElement('div');
   tooltip.id = 'tooltip';
-  tooltip.innerHTML = text;
+
+  const textArea = document.createElement('p');
+  textArea.innerHTML = text;
+  textArea.style.margin = 0;
+  textArea.style.overflowWrap = 'break-word';
+  tooltip.appendChild(textArea);
   tooltipContainer.appendChild(tooltip);
 
   tooltip.style.position = 'relative';
