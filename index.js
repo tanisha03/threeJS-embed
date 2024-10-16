@@ -927,6 +927,7 @@ let scene,
   }
 
   function showInput(){
+    if(currentlyAnimating) return;
     const input = document.getElementById('input');
     input.style.display = 'block';
   }
