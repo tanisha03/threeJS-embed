@@ -31,7 +31,7 @@
 //     type: 'scroll',
 //     scrollValue: 70,
 //     pagePath: '/',
-//     match: 'exact',
+//     match: 'equals',
 //     animation: 'shrug',
 //     hasClose: true,
 //     time: 15000,
@@ -380,11 +380,11 @@ let scene,
     window.dispatchEvent(pathChangeEvent);
   }
 
-  let previousPathname = window.location.pathname;
+  let previousPathname = window.location.href;
 
   const observer = new MutationObserver(() => {
-    if (window.location.pathname !== previousPathname) {
-      previousPathname = window.location.pathname;
+    if (window.location.href !== previousPathname) {
+      previousPathname = window.location.href;
       const tooltipContainer = document.getElementById('tooltipContainer');
       if(tooltipContainer){
         tooltipContainer.remove();
@@ -402,6 +402,64 @@ let scene,
 
   function triggerConfig() {
     CONFIG.map(config => {
+      let isTrafficSourceValid = true;
+      let isLocationValid = true;
+      if(config?.traffic_source?.length){
+        if(!config.traffic_source.includes('any')){
+          const path = window.location.href;
+          const referrer = document.referrer;
+          isTrafficSourceValid = false;
+          config.traffic_source.map(loc => {
+            switch(loc){
+              case 'direct':
+                if(referrer==='') isTrafficSourceValid = true;
+                break;
+              case 'google':
+                if(referrer==='https://www.google.com/') isTrafficSourceValid = true;
+                break;
+              case 'yahoo':
+                if(referrer==='https://www.yahoo.com/') isTrafficSourceValid = true;
+                break;
+              case 'bing':
+                if(referrer==='https://www.bing.com/') isTrafficSourceValid = true;
+                break;
+              case 'youtube':
+                if(referrer==='https://www.youtube.com/') isTrafficSourceValid = true;
+                break;
+              case 'reddit':
+                if(referrer==='https://www.reddit.com/') isTrafficSourceValid = true;
+                break;
+              case 'paid_google':
+                if(path.includes('gclid')) isTrafficSourceValid = true;
+                break;
+              case 'paid_bing':
+                if(path.includes('msclkid')) isTrafficSourceValid = true;
+                break;
+              case 'paid_linkedin':
+                if(path.includes('li_fat_id')) isTrafficSourceValid = true;
+                break;
+              case 'paid_meta':
+                if(path.includes('fbclid')) isTrafficSourceValid = true;
+                break;
+              case 'paid_youtube':
+                if(path.includes('wbraid')) isTrafficSourceValid = true;
+                break;
+              case 'paid_reddit':
+                if(path.includes('cid')) isTrafficSourceValid = true;
+                break;
+            }
+          })
+        }
+      }
+      if(config?.location?.length){
+        isLocationValid=false;
+        const currTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        config?.location.map(loc => {
+          if(currTimezone === loc) isLocationValid = true;
+        })
+      }
+      console.log(isTrafficSourceValid, isLocationValid);
+      if(!(isTrafficSourceValid && isLocationValid)) return;
       switch(config.type){
         case 'onFirstLand':
           if(!isFirstLandTriggered){
@@ -436,9 +494,9 @@ let scene,
             const docHeight = document.documentElement.scrollHeight;
             const winHeight = window.innerHeight;
             const scrollPercent = (scrollTop / (docHeight - winHeight)) * 100;
-            const path = window.location.pathname;
-            
-            if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath)) && Number(scrollPercent)>Number(config.scrollValue)){
+            const path = window.location.href;
+
+            if((config.match === 'equals' ? path === config.pagePath : path.includes(config.pagePath)) && Number(scrollPercent)>Number(config.scrollValue)){
               if(scrollState[config.id]) return;
               scrollState[config.id] = true;
               showUIAnimation(config);
@@ -446,12 +504,12 @@ let scene,
           });
           break;
         case 'popstate':
-          const path = window.location.pathname;
-          if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
+          const path = window.location.href;
+          if((config.match === 'equals' ? path === config.pagePath : path.includes(config.pagePath))){
             showUIAnimation(config);
           }
           window.addEventListener('pathChange', () => {
-            if((config.match === 'exact' ? path === config.pagePath : path.includes(config.pagePath))){
+            if((config.match === 'equals' ? path === config.pagePath : path.includes(config.pagePath))){
               if(config.delay){
                 setTimeout(() => showUIAnimation(config), config.delay);
               } else{
