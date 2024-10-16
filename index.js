@@ -548,7 +548,7 @@ let scene,
       if(config.orientation === 'landscape'){
         innerHTML = `
           <div style="display:flex;flex-direction:row;align-items:center;background:${config.tooltip_bg};padding:8px;border-radius:12px;max-width:280px">
-            <img src=${config.imageUrl} style="width:160px;height:90px;border-radius:10px;object-fit:none;margin-right:12px"/>
+            <img src=${config.imageUrl} style="height:90px;border-radius:10px;margin-right:12px"/>
             <div id="text-area">
               <div style="color:${config.tooltip_color}">${config.text}</div>
             </div>
@@ -557,7 +557,7 @@ let scene,
       } else {
         innerHTML = `
           <div style="display:flex;flex-direction:row;align-items:center;background:${config.tooltip_bg};padding:8px;border-radius:12px;max-width:280px">
-            <img src=${config.imageUrl} style="width:128px;height:160px;border-radius:10px;object-fit:none;margin-right:12px"/>
+            <img src=${config.imageUrl} style="height:124px;border-radius:10px;margin-right:12px"/>
             <div id="text-area">
               <div style="color:${config.tooltip_color}">${config.text}</div>
             </div>
