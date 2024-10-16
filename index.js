@@ -148,9 +148,13 @@ let scene,
     const fallbackLoader = document.createElement('div');
     fallbackLoader.id = 'loader';
 
-    document.addEventListener('DOMContentLoaded', function() {
+    if(document.body){
       document.body.appendChild(fallbackLoader);
-    });
+    } else{
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.appendChild(fallbackLoader);
+      });
+    }
     
     const style = document.createElement('style');
     style.type = 'text/css';
