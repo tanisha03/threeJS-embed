@@ -513,7 +513,8 @@ let scene,
             showUIAnimation(config);
           }
           window.addEventListener('pathChange', () => {
-            if((config.match === 'equals' ? path === config.pagePath : path.includes(config.pagePath))){
+            const pagePath = window.location.href;
+            if((config.match === 'equals' ? pagePath === config.pagePath : pagePath.includes(config.pagePath))){
               if(config.delay){
                 setTimeout(() => showUIAnimation(config), config.delay);
               } else{
@@ -573,6 +574,7 @@ let scene,
 
   function showTooltip(text, bg, color, time, ctaList, hasClose, onClickClose, timerCountdown, animationCB) {
     currentlyAnimating = true;
+    hideInput();
     const tooltipContainer = document.createElement('div');
     tooltipContainer.id = 'tooltipContainer';
     tooltipContainer.style.position = 'fixed';
@@ -742,6 +744,7 @@ let scene,
 
   function showOverlay(innerHTML, time, ctaList, hasClose,onClickClose, timerCountdown, animationCB) {
     currentlyAnimating = true;
+    hideInput();
     const tooltipContainer = document.createElement('div');
     tooltipContainer.style.position = 'fixed';
     tooltipContainer.innerHTML = innerHTML;
