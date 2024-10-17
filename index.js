@@ -746,10 +746,9 @@ let scene,
     currentlyAnimating = true;
     hideInput();
     const tooltipContainer = document.createElement('div');
+    tooltipContainer.id = 'tooltipContainer';
     tooltipContainer.style.position = 'fixed';
     tooltipContainer.innerHTML = innerHTML;
-
-    console.log('~~~~', tooltipContainer)
 
     function closeUI(){
       tooltipContainer.remove();
