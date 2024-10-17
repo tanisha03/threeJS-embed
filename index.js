@@ -619,7 +619,7 @@ let scene,
     tooltip.appendChild(arrow);
 
     function closeUI(){
-      if(currentlyAnimating !== id) return;
+      if(currentAnimationID !== id) return;
       tooltipContainer.remove();
       currentlyAnimating = false;
       animationCB();
