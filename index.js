@@ -376,6 +376,7 @@ let scene,
 
   let isFirstLandTriggered = false;
   let currentlyAnimating = false;
+  let currentAnimationID = null;
 
   //path change event
 
@@ -540,7 +541,7 @@ let scene,
       playModifierAnimation(idle, 0.25, possibleAnims[animationIdx], 0.25)
     }
     if(type === 'tooltip'){
-      showTooltip(config.text, config.tooltip_bg, config.tooltip_color, config.time, config.cta, config.hasClose, config.onClickClose, config.timerCountdown, () => {
+      showTooltip(config.id, config.text, config.tooltip_bg, config.tooltip_color, config.time, config.cta, config.hasClose, config.onClickClose, config.timerCountdown, () => {
         if(config.onEnd) showUIAnimation(CONFIG.filter(c => c.id === config.onEnd)[0])
         else showInput();
       });
@@ -565,15 +566,16 @@ let scene,
           </div>
         `;
       }
-      showOverlay(innerHTML, config.time, config.cta, config.hasClose, config.onClickClose, config.timerCountdown, () => {
+      showOverlay(config.id, innerHTML, config.time, config.cta, config.hasClose, config.onClickClose, config.timerCountdown, () => {
         if(config.onEnd) showUIAnimation(CONFIG.filter(c => c.id === config.onEnd)[0])
         else showInput();
       });
     }
   }
 
-  function showTooltip(text, bg, color, time, ctaList, hasClose, onClickClose, timerCountdown, animationCB) {
+  function showTooltip(id, text, bg, color, time, ctaList, hasClose, onClickClose, timerCountdown, animationCB) {
     currentlyAnimating = true;
+    currentAnimationID = id;
     hideInput();
     const tooltipContainer = document.createElement('div');
     tooltipContainer.id = 'tooltipContainer';
@@ -617,7 +619,7 @@ let scene,
     tooltip.appendChild(arrow);
 
     function closeUI(){
-      if(currentlyAnimating) return;
+      if(currentlyAnimating !== id) return;
       tooltipContainer.remove();
       currentlyAnimating = false;
       animationCB();
@@ -743,8 +745,9 @@ let scene,
     }
   }
 
-  function showOverlay(innerHTML, time, ctaList, hasClose,onClickClose, timerCountdown, animationCB) {
+  function showOverlay(id, innerHTML, time, ctaList, hasClose,onClickClose, timerCountdown, animationCB) {
     currentlyAnimating = true;
+    currentAnimationID = id;
     hideInput();
     const tooltipContainer = document.createElement('div');
     tooltipContainer.id = 'tooltipContainer';
@@ -752,7 +755,7 @@ let scene,
     tooltipContainer.innerHTML = innerHTML;
 
     function closeUI(){
-      if(currentlyAnimating) return;
+      if(currentAnimationID !== id) return;
       tooltipContainer.remove();
       currentlyAnimating = false;
       animationCB();
