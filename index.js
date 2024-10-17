@@ -377,6 +377,7 @@ let scene,
   let isFirstLandTriggered = false;
   let currentlyAnimating = false;
   let currentAnimationID = null;
+  let timeoutDisappear = null;
 
   //path change event
 
@@ -394,6 +395,8 @@ let scene,
       if(tooltipContainer){
         tooltipContainer.remove();
       }
+      
+      if(timeoutDisappear) clearTimeout(timeoutDisappear);
       currentlyAnimating = false;
       showInput();
       dispatchPathChangeEvent();
@@ -623,6 +626,7 @@ let scene,
       tooltipContainer.remove();
       currentlyAnimating = false;
       animationCB();
+      timeoutDisappear = null;
     }
 
     if(hasClose){
@@ -739,7 +743,7 @@ let scene,
     tooltipContainer.style.display = 'block';
 
     if(time){
-      setTimeout(() => {
+      timeoutDisappear = setTimeout(() => {
         closeUI();
       }, time*1000);
     }
@@ -759,6 +763,7 @@ let scene,
       tooltipContainer.remove();
       currentlyAnimating = false;
       animationCB();
+      timeoutDisappear = null;
     }
 
     if(hasClose){
@@ -876,7 +881,7 @@ let scene,
     tooltipContainer.style.display = 'block';
 
     if(time){
-      setTimeout(() => {
+      timeoutDisappear = setTimeout(() => {
         closeUI();
       }, time*1000);
     }
