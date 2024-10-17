@@ -617,6 +617,7 @@ let scene,
     tooltip.appendChild(arrow);
 
     function closeUI(){
+      if(currentlyAnimating) return;
       tooltipContainer.remove();
       currentlyAnimating = false;
       animationCB();
@@ -751,6 +752,7 @@ let scene,
     tooltipContainer.innerHTML = innerHTML;
 
     function closeUI(){
+      if(currentlyAnimating) return;
       tooltipContainer.remove();
       currentlyAnimating = false;
       animationCB();
