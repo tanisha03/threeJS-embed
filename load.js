@@ -16,7 +16,7 @@ loadScript('https://cdn.jsdelivr.net/npm/three@0.139.0/build/three.min.js', func
   loadScript('https://cdn.jsdelivr.net/npm/three@0.139.0/examples/js/loaders/GLTFLoader.js', function() {
     
     // Load your main script after both scripts are loaded
-    loadScript('https://cdn.jsdelivr.net/gh/tanisha03/threeJS-embed@latest/index.js', function() {
+    loadScript('https://cdn.jsdelivr.net/gh/tanisha03/threeJS-embed@m-2-ff/index.js', function() {
       console.log('All scripts loaded!');
     });
 
