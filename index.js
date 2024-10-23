@@ -505,9 +505,15 @@ let scene,
             const path = window.location.href;
 
             if((config.match === 'equals' ? path === config.pagePath : path.includes(config.pagePath)) && Number(scrollPercent)>Number(config.scrollValue)){
-              if(scrollState[config.id]) return;
-              scrollState[config.id] = true;
-              showUIAnimation(config);
+              if(config.delay){
+                if(scrollState[config.id]) return;
+                scrollState[config.id] = true;
+                showUIAnimation(config);
+              } else{
+                if(scrollState[config.id]) return;
+                scrollState[config.id] = true;
+                showUIAnimation(config);
+              }
             }
           });
           break;
@@ -536,7 +542,7 @@ let scene,
     resetHead();
     let animationIdx = -1;
     if(config.animation){
-      animationIdx = possibleAnims.findIndex(animation => animation.name === config.animation);
+      animationIdx = possibleAnims?.findIndex(animation => animation.name === config.animation);
     }
     const type = config.imageUrl ? 'overlay' : 'tooltip';
     hideInput();
@@ -609,17 +615,46 @@ let scene,
     tooltip.style.setProperty('--tooltip-arrow-size', '5px');
     tooltip.style.setProperty('--tooltip-arrow-color', bg)
     tooltip.style.margin = '8px 0'
+
+    // const arrow = document.createElement('div');
+    // arrow.style.position = 'absolute';
+    // arrow.style.width = '0';
+    // arrow.style.height = '0';
+    // arrow.style.borderLeft = '8px solid transparent';
+    // arrow.style.borderRight = '8px solid transparent';
+    // arrow.style.borderTop = `8px solid ${bg}`;
+    // arrow.style.top = '40%';
+    // arrow.style.right = '-12px';
+    // arrow.style.transform = 'rotate(-90deg)';
+    // arrow.style.boxShadow = '0 0 4px black'; // Shadow for the arrow
+
     const arrow = document.createElement('div');
     arrow.style.position = 'absolute';
-    arrow.style.width = '0';
-    arrow.style.height = '0';
-    arrow.style.borderLeft = '8px solid transparent';
-    arrow.style.borderRight = '8px solid transparent';
-    arrow.style.borderTop = `8px solid ${bg}`;
-    arrow.style.top = '40%';
-    arrow.style.right = '-12px';
-    arrow.style.transform = 'rotate(-90deg)';
-    tooltip.appendChild(arrow);
+    arrow.style.width = '16px'; // Width of the arrow
+    arrow.style.height = '10px'; // Height of the arrow
+    arrow.style.backgroundColor = bg; // Main arrow color
+    arrow.style.clipPath = 'polygon(0% 100%, 100% 100%, 50% 0%)'; // Triangle shape
+    arrow.style.top = '40%'; // Positioning
+    arrow.style.right = '-11px'; // Positioning
+    arrow.style.transform = 'rotate(90deg)';
+
+    // Shadow effect using a larger square and positioning it
+    const shadow = document.createElement('div');
+    shadow.style.position = 'absolute';
+    shadow.style.width = '16px'; // Same dimensions as the arrow
+    shadow.style.height = '10px'; // Same dimensions as the arrow
+    shadow.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Shadow color
+    shadow.style.clipPath = 'polygon(0% 100%, 100% 100%, 50% 0%)'; // Same triangle shape
+    shadow.style.top = '42%'; // Slightly offset for shadow effect
+    shadow.style.right = '-12px'; // Slightly offset for shadow effect
+    shadow.style.transform = 'rotate(90deg)';
+    shadow.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.25)'; // Box shadow for blurred effect
+
+    // shadow.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.25)'; // Box shadow for the shadow element
+
+    // Append both shadow and arrow to the tooltip
+    tooltip.appendChild(shadow);
+   tooltip.appendChild(arrow);
 
     function closeUI(){
       if(currentAnimationID !== id) return;
@@ -629,14 +664,14 @@ let scene,
       timeoutDisappear = null;
     }
 
-    if(hasClose){
+    // if(hasClose){
       const closeBtn = document.createElement('button');
       closeBtn.style.background = 'white';
       closeBtn.style.padding = '2px';
       closeBtn.style.border = '1px solid black';
       closeBtn.style.position = 'absolute';
       closeBtn.style.top = '2px';
-      closeBtn.style.right = '-4px';
+      closeBtn.style.left = '-4px';
       closeBtn.style.width = '16px';
       closeBtn.style.height = '16px';
       closeBtn.style.fontSize = '10px';
@@ -660,7 +695,7 @@ let scene,
         closeUI();
       });
       tooltipContainer.appendChild(closeBtn);
-    }
+    // }
 
     if(timerCountdown){
       const timer = document.createElement('div');
@@ -709,9 +744,10 @@ let scene,
         btn.style.fontSize = '14px';
         btn.style.background = ctaItem.bg;
         btn.style.color = ctaItem.color;
-        btn.style.padding = '6px 10px';
+        btn.style.padding = '6px 12px';
         btn.style.marginRight = '6px';
         btn.style.cursor = 'pointer';
+        btn.style.border = '1px solid black';
         btn.addEventListener('click', () => {
           if(ctaItem.onClick){
             ctaItem.onClick();
@@ -742,11 +778,11 @@ let scene,
     tooltipContainer.style.bottom = isMobile ? '64px' : '80px';
     tooltipContainer.style.display = 'block';
 
-    if(time){
-      timeoutDisappear = setTimeout(() => {
-        closeUI();
-      }, time*1000);
-    }
+    // if(time){
+    //   timeoutDisappear = setTimeout(() => {
+    //     closeUI();
+    //   }, time*1000);
+    // }
   }
 
   function showOverlay(id, innerHTML, time, ctaList, hasClose,onClickClose, timerCountdown, animationCB) {
@@ -756,6 +792,7 @@ let scene,
     const tooltipContainer = document.createElement('div');
     tooltipContainer.id = 'tooltipContainer';
     tooltipContainer.style.position = 'fixed';
+    tooltipContainer.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.25)';
     tooltipContainer.innerHTML = innerHTML;
 
     function closeUI(){
@@ -766,7 +803,7 @@ let scene,
       timeoutDisappear = null;
     }
 
-    if(hasClose){
+    // if(hasClose){
       const closeBtn = document.createElement('button');
       closeBtn.style.background = 'white';
       closeBtn.style.padding = '2px';
@@ -797,7 +834,7 @@ let scene,
         closeUI();
       });
       tooltipContainer.appendChild(closeBtn);
-    }
+    // }
 
     if(timerCountdown){
       const timer = document.createElement('div');
@@ -880,11 +917,11 @@ let scene,
     tooltipContainer.style.top = (canvasBounds.top + 88) + 'px';
     tooltipContainer.style.display = 'block';
 
-    if(time){
-      timeoutDisappear = setTimeout(() => {
-        closeUI();
-      }, time*1000);
-    }
+    // if(time){
+    //   timeoutDisappear = setTimeout(() => {
+    //     closeUI();
+    //   }, time*1000);
+    // }
   }
 
   function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
