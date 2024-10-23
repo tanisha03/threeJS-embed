@@ -616,18 +616,6 @@ let scene,
     tooltip.style.setProperty('--tooltip-arrow-color', bg)
     tooltip.style.margin = '8px 0'
 
-    // const arrow = document.createElement('div');
-    // arrow.style.position = 'absolute';
-    // arrow.style.width = '0';
-    // arrow.style.height = '0';
-    // arrow.style.borderLeft = '8px solid transparent';
-    // arrow.style.borderRight = '8px solid transparent';
-    // arrow.style.borderTop = `8px solid ${bg}`;
-    // arrow.style.top = '40%';
-    // arrow.style.right = '-12px';
-    // arrow.style.transform = 'rotate(-90deg)';
-    // arrow.style.boxShadow = '0 0 4px black'; // Shadow for the arrow
-
     const arrow = document.createElement('div');
     arrow.style.position = 'absolute';
     arrow.style.width = '16px'; // Width of the arrow
@@ -778,11 +766,11 @@ let scene,
     tooltipContainer.style.bottom = isMobile ? '64px' : '80px';
     tooltipContainer.style.display = 'block';
 
-    // if(time){
-    //   timeoutDisappear = setTimeout(() => {
-    //     closeUI();
-    //   }, time*1000);
-    // }
+    if(time){
+      timeoutDisappear = setTimeout(() => {
+        closeUI();
+      }, time*1000);
+    }
   }
 
   function showOverlay(id, innerHTML, time, ctaList, hasClose,onClickClose, timerCountdown, animationCB) {
@@ -917,11 +905,11 @@ let scene,
     tooltipContainer.style.top = (canvasBounds.top + 88) + 'px';
     tooltipContainer.style.display = 'block';
 
-    // if(time){
-    //   timeoutDisappear = setTimeout(() => {
-    //     closeUI();
-    //   }, time*1000);
-    // }
+    if(time){
+      timeoutDisappear = setTimeout(() => {
+        closeUI();
+      }, time*1000);
+    }
   }
 
   function playModifierAnimation(from, fSpeed, finalAnim, tSpeed) {
